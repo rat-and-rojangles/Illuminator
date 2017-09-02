@@ -14,7 +14,7 @@ using UnityEngine;
 /// <summary>
 /// Effectively like a horizontal room. Used for spawning new rooms.
 /// </summary>
-public class MapSegment : MonoBehaviour {
+public class MapSegmentSpawner : MonoBehaviour {
 
 	/// <summary>
 	/// Rate at which the level scrolls.
@@ -31,7 +31,13 @@ public class MapSegment : MonoBehaviour {
 	[SerializeField]
 	private GameObject nextRoom;
 
-	// Update is called once per frame
+	private PlaneManager myPlaneManager;
+
+	void Awake () {
+		myPlaneManager = transform.parent.GetComponent<PlaneManager> ();
+	}
+
+
 	void Update () {
 		if (!alreadySpawnedAnother && transform.position.x <= 0f) {
 			alreadySpawnedAnother = true;
@@ -40,6 +46,7 @@ public class MapSegment : MonoBehaviour {
 			newRoom.transform.position = transform.position + Vector3.right * STANDARD_WIDTH;
 		}
 		else if (transform.position.x <= -STANDARD_WIDTH * 1.5f) {
+			myPlaneManager.RemoveLastMapSegment ();
 			GameObject.Destroy (this.gameObject);
 		}
 	}

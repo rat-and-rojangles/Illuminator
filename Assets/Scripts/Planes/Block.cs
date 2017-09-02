@@ -6,30 +6,29 @@ using UnityEngine;
 
 public class Block : MonoBehaviour {
 
-	private PlaneState m_currentState = PlaneState.Active;
-	public PlaneState currentState {
+	private PlaneState m_currentState;
+	public PlaneState state {
 		get {
 			return m_currentState;
 		}
 		set {
 			switch (value) {
 				case PlaneState.Primed:
-					if (m_currentState != PlaneState.Primed) {
-						myCollider.enabled = false;
-						mySpriteRenderer.enabled = true;
-						mySpriteRenderer.sprite = PlaneManager.backgroundBlock;
-					}
+					myCollider.enabled = false;
+					mySpriteRenderer.enabled = true;
+					mySpriteRenderer.sprite = PlaneManager.backgroundBlock;
+					m_currentState = value;
 					break;
 				case PlaneState.Active:
-					if (m_currentState == PlaneState.Primed) {
-						myCollider.enabled = true;
-						mySpriteRenderer.sprite = PlaneManager.foregroundBlock;
-					}
+					myCollider.enabled = true;
+					mySpriteRenderer.enabled = true;
+					mySpriteRenderer.sprite = PlaneManager.foregroundBlock;
+					m_currentState = value;
 					break;
 				case PlaneState.Shelved:
-					if (m_currentState == PlaneState.Primed) {
-						mySpriteRenderer.enabled = false;
-					}
+					myCollider.enabled = false;
+					mySpriteRenderer.enabled = false;
+					m_currentState = value;
 					break;
 			}
 		}
@@ -41,7 +40,19 @@ public class Block : MonoBehaviour {
 	[SerializeField]
 	private SpriteRenderer mySpriteRenderer;
 
+	private MapSegmentPlane myPlaneSegment;
+
 	void Awake () {
-		//GamePlane myPlane = transform.parent.GetComponent<GamePlane> ();
+		myPlaneSegment = transform.parent.GetComponent<MapSegmentPlane> ();
+		myPlaneSegment.allBlocks.Push (this);
+		if (myPlaneSegment.index == 0) {
+			m_currentState = PlaneState.Active;
+		}
+		else if (myPlaneSegment.index == 1) {
+			m_currentState = PlaneState.Primed;
+		}
+		else {
+			m_currentState = PlaneState.Shelved;
+		}
 	}
 }

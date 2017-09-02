@@ -9,8 +9,6 @@ public class PlayerCharacter : MonoBehaviour {
 	public float runSpeed = 8f;
 	public float jumpHeight = 3f;
 
-	public float constantHorizontalSpeed = 0f;
-
 	private CharacterController2D _controller;
 	private Vector3 _velocity;
 
@@ -26,10 +24,19 @@ public class PlayerCharacter : MonoBehaviour {
 			_velocity.y = 0;
 		}
 
-		//_velocity.x = Input.GetAxis ("Horizontal") * runSpeed + constantHorizontalSpeed;
-		_velocity.x = Input.GetAxis ("Horizontal") * runSpeed + MapSegment.AUTO_SCROLL_RATE;
+		//_velocity.x = Input.GetAxis ("Horizontal") * runSpeed + MapSegmentSpawner.AUTO_SCROLL_RATE;
+		if (Input.GetKey (KeyCode.RightArrow)) {
+			_velocity.x = runSpeed + MapSegmentSpawner.AUTO_SCROLL_RATE;
+		}
+		else if (Input.GetKey (KeyCode.LeftArrow)) {
+			_velocity.x = -runSpeed + MapSegmentSpawner.AUTO_SCROLL_RATE;
+		}
+		else{
+			_velocity.x = MapSegmentSpawner.AUTO_SCROLL_RATE;
+		}
 
-		// we can only jump whilst grounded
+		// we can only jump from the ground
+		// note the kinematic formula
 		if (_controller.isGrounded && Input.GetKeyDown (KeyCode.UpArrow)) {
 			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 		}
