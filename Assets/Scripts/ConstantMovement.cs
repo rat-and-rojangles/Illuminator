@@ -5,6 +5,6 @@ using UnityEngine;
 public class ConstantMovement : MonoBehaviour {
 
 	void Update () {
-		transform.position += MapSegmentSpawner.AUTO_SCROLL_RATE * Vector3.left * Time.deltaTime;
+		transform.position += Game.staticRef.AUTO_SCROLL_RATE * Vector3.left * Time.deltaTime;
 	}
 }

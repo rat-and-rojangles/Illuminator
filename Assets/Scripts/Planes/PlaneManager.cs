@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneManager : MonoBehaviour {
-
-	public static Sprite backgroundBlock;
-	public static Sprite foregroundBlock;
-
 	private int m_currentActiveIndex = 0;
 	public int currentActiveIndex {
 		get { return m_currentActiveIndex; }
@@ -16,52 +12,67 @@ public class PlaneManager : MonoBehaviour {
 		get { return m_currentPrimedIndex; }
 	}
 
-	public int planesInThisLevel;
+	[SerializeField]
+	private int planesInThisLevel;
+
+	public Plane [] m_planes = null;
 
 	/// <summary>
-	/// The index is the plane index. Inside, there is a queue of Map Segment Planes. Popped when the map segment is deleted.
+	/// All planes in the world.
 	/// </summary>
-	public Queue<MapSegmentPlane> [] planes;
+	public Plane [] planes {
+		get { return m_planes; }
+	}
 
-	[SerializeField]
-	private Sprite m_backgroundBlock;
-	[SerializeField]
-	private Sprite m_foregroundBlock;
+	public Plane activePlane {
+		get { return planes [currentActiveIndex]; }
+	}
+	public Plane primedPlane {
+		get { return planes [currentPrimedIndex]; }
+	}
+
+	public Material activeMaterial;
+	public Material primedMaterial;
 
 	void Awake () {
-		backgroundBlock = m_backgroundBlock;
-		foregroundBlock = m_foregroundBlock;
-		planes = new Queue<MapSegmentPlane> [planesInThisLevel];
+		m_planes = new Plane [planesInThisLevel];
+
+		float baseHue = Random.value;
 		for (int x = 0; x < planesInThisLevel; x++) {
-			planes [x] = new Queue<MapSegmentPlane> ();
+			//planes [x] = new Plane (Random.ColorHSV ());
+			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + x * 1.0f / planesInThisLevel), 1, 1));
 		}
 	}
 
-	void Update () {
-		if (Input.GetKeyDown (KeyCode.S)) {
-			Activate ();
-		}
+	void Start () {
+		ApplyColors ();
 	}
-
 
 	/// <summary>
 	/// Swaps the primed and active worlds.
 	/// </summary>
-	public void Activate () {
-		foreach (MapSegmentPlane msp in planes [m_currentActiveIndex]) {
-			msp.ChangeState (PlaneState.Primed);
+	public void Swap () {
+		// first do a death check on player
+		if (Game.staticRef.player.DeathCheck ()) {
+			print ("fukt kid");
+			Game.staticRef.player.Die ();
 		}
-		foreach (MapSegmentPlane msp in planes [m_currentPrimedIndex]) {
-			msp.ChangeState (PlaneState.Active);
-		}
-		int t = m_currentActiveIndex;
-		m_currentActiveIndex = m_currentPrimedIndex;
-		m_currentPrimedIndex = t;
+
+		Utility.Swap (ref m_currentActiveIndex, ref m_currentPrimedIndex);
+		ApplyColors ();
+
+		activePlane.ApplyState ();
+		primedPlane.ApplyState ();
 	}
 
 	public void RemoveLastMapSegment () {
-		foreach (Queue<MapSegmentPlane> qmsp in planes) {
-			qmsp.Dequeue ();
+		foreach (Plane p in planes) {
+			p.mapSegments.Dequeue ();
 		}
+	}
+
+	private void ApplyColors () {
+		activeMaterial.color = planes [currentActiveIndex].color;
+		primedMaterial.color = planes [currentPrimedIndex].color;
 	}
 }

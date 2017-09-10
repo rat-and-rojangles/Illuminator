@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour {
 
+	[SerializeField]
 	private PlaneState m_currentState;
 	public PlaneState state {
 		get {
@@ -14,20 +15,20 @@ public class Block : MonoBehaviour {
 		set {
 			switch (value) {
 				case PlaneState.Primed:
-					myCollider.enabled = false;
-					mySpriteRenderer.enabled = true;
-					mySpriteRenderer.sprite = PlaneManager.backgroundBlock;
+					gameObject.SetActive (true);
+					m_solidCollider.enabled = false;
+					m_triggerCollider.enabled = true;
+					m_meshRenderer.material = Game.staticRef.planeManager.primedMaterial;
 					m_currentState = value;
 					break;
 				case PlaneState.Active:
-					myCollider.enabled = true;
-					mySpriteRenderer.enabled = true;
-					mySpriteRenderer.sprite = PlaneManager.foregroundBlock;
+					m_solidCollider.enabled = true;
+					m_triggerCollider.enabled = false;
+					m_meshRenderer.material = Game.staticRef.planeManager.activeMaterial;
 					m_currentState = value;
 					break;
 				case PlaneState.Shelved:
-					myCollider.enabled = false;
-					mySpriteRenderer.enabled = false;
+					gameObject.SetActive (false);
 					m_currentState = value;
 					break;
 			}
@@ -35,24 +36,28 @@ public class Block : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private BoxCollider2D myCollider;
+	private BoxCollider2D m_solidCollider;
 
 	[SerializeField]
-	private SpriteRenderer mySpriteRenderer;
+	private BoxCollider2D m_triggerCollider;
 
-	private MapSegmentPlane myPlaneSegment;
+	[SerializeField]
+	private MeshRenderer m_meshRenderer;
 
-	void Awake () {
-		myPlaneSegment = transform.parent.GetComponent<MapSegmentPlane> ();
-		myPlaneSegment.allBlocks.Push (this);
-		if (myPlaneSegment.index == 0) {
+	private MapSegment m_mapSegment;
+
+	void Start () {
+		m_mapSegment = transform.parent.GetComponent<MapSegment> ();
+		m_mapSegment.allBlocks.Push (this);
+		if (m_mapSegment.plane == Game.staticRef.planeManager.activePlane) {
 			m_currentState = PlaneState.Active;
 		}
-		else if (myPlaneSegment.index == 1) {
+		else if (m_mapSegment.plane == Game.staticRef.planeManager.primedPlane) {
 			m_currentState = PlaneState.Primed;
 		}
 		else {
 			m_currentState = PlaneState.Shelved;
 		}
+		state = m_currentState;
 	}
 }
