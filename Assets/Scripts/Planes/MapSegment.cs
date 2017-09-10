@@ -9,7 +9,6 @@ public class MapSegment : MonoBehaviour {
 	/// <summary>
 	/// The plane associated with this map segment.
 	/// </summary>
-	/// <returns></returns>
 	public Plane plane {
 		get { return Game.staticRef.planeManager.planes [m_index]; }
 	}
