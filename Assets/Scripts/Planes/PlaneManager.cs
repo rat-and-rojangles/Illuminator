@@ -53,9 +53,8 @@ public class PlaneManager : MonoBehaviour {
 	/// </summary>
 	public void Swap () {
 		// first do a death check on player
-		if (Game.staticRef.player.DeathCheck ()) {
-			print ("fukt kid");
-			Game.staticRef.player.Die ();
+		if (Game.staticRef.player.SlamCheck ()) {
+			Game.staticRef.player.DieFromSlam ();
 		}
 
 		Utility.Swap (ref m_currentActiveIndex, ref m_currentPrimedIndex);

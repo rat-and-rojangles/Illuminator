@@ -66,26 +66,39 @@ public class PlayerCharacter : MonoBehaviour {
 
 		// grab our current _velocity to use as a base for all calculations
 		velocity = controller.velocity;
+
+		if (transform.position.y < -20f) {
+			DieFromFall ();
+		}
 	}
 
 	/// <summary>
-	/// Would the character be dead when this is called?
+	/// Would the character be smashed by a wall if you swapped right now?
 	/// </summary>
-	public bool DeathCheck () {
+	public bool SlamCheck () {
 		return hurtbox.withinTrigger;
 	}
 
-	public void Die () {
+	public void DieFromSlam () {
 		animator.enabled = false;
 		controller.enabled = false;
 		this.enabled = false;
 
 		foreach (Rigidbody rb in ragdollBodies) {
 			rb.isKinematic = false;
-			rb.velocity = new Vector3 (0f, -1f, Random.Range (-10, -5));
+			rb.velocity = new Vector3 (0f, -1f, Random.Range (-10f, -5f));
 		}
+		StartCoroutine (Game.staticRef.Halt ());
+	}
+	public void DieFromFall () {
+		controller.enabled = false;
+		this.enabled = false;
+		StartCoroutine (Game.staticRef.Halt ());
 	}
 
+	/// <summary>
+	/// Solely for configuring the ragdoll in the editor.
+	/// </summary>
 	[ContextMenu ("EnableKinematic")]
 	private void EnableKinematic () {
 		foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody> ()) {
