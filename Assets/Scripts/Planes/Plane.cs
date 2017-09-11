@@ -6,7 +6,7 @@ public class Plane {
 
 	public Plane (Color c) {
 		m_color = c;
-		m_mapSegments = new Queue<MapSegment> ();
+		m_planeSegments = new Queue<PlaneSegment> ();
 	}
 
 	private Color m_color;
@@ -19,12 +19,10 @@ public class Plane {
 		get { return m_color; }
 	}
 
-	private Queue<MapSegment> m_mapSegments;
-	public Queue<MapSegment> mapSegments {
-		get { return m_mapSegments; }
+	private Queue<PlaneSegment> m_planeSegments;
+	public Queue<PlaneSegment> planeSegments {
+		get { return m_planeSegments; }
 	}
-
-	public Queue<PlaneSegment> planeSegments;
 
 	public PlaneState state {
 		get {
@@ -41,8 +39,8 @@ public class Plane {
 	}
 
 	public void ApplyState () {
-		foreach (MapSegment ms in m_mapSegments) {
-			ms.ApplyState ();
+		foreach (PlaneSegment ps in m_planeSegments) {
+			ps.ApplyState ();
 		}
 	}
 }

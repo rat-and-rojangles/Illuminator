@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Put this on the world object.
+/// </summary>
 public class PlaneSegmentSpawner : MonoBehaviour {
 	[SerializeField]
 	private GameObject [] segmentsAvailable;
 
-	[SerializeField]
-	private Transform world;
-
 	public static float SPAWN_BOUNDARY_X = 20f;
 
-	void Update () {
+	void LateUpdate () {
 		for (int x = 0; x < Game.staticRef.planeManager.planes.Length; x++) {
 			// Despawn old
 			PlaneSegment seg = Game.staticRef.planeManager.planes [x].planeSegments.Peek ();
@@ -26,7 +26,7 @@ public class PlaneSegmentSpawner : MonoBehaviour {
 				furthestRight += ps.width;
 			}
 			if (furthestRight < SPAWN_BOUNDARY_X) {
-				GameObject newSegment = GameObject.Instantiate (segmentsAvailable.RandomElement (), world, true);
+				GameObject newSegment = GameObject.Instantiate (segmentsAvailable.RandomElement (), transform, true);
 				newSegment.name = "PlaneSegment";
 				newSegment.transform.position = Vector3.right * furthestRight;
 				newSegment.GetComponent<PlaneSegment> ().planeIndex = x;

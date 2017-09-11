@@ -20,12 +20,14 @@ public class Block : MonoBehaviour {
 					m_triggerCollider.enabled = true;
 					m_meshRenderer.material = Game.staticRef.planeManager.primedMaterial;
 					m_currentState = value;
+					transform.localScale = Vector3.one * 0.8f;
 					break;
 				case PlaneState.Active:
 					m_solidCollider.enabled = true;
 					m_triggerCollider.enabled = false;
 					m_meshRenderer.material = Game.staticRef.planeManager.activeMaterial;
 					m_currentState = value;
+					transform.localScale = Vector3.one;
 					break;
 				case PlaneState.Shelved:
 					gameObject.SetActive (false);
@@ -44,15 +46,15 @@ public class Block : MonoBehaviour {
 	[SerializeField]
 	private MeshRenderer m_meshRenderer;
 
-	private MapSegment m_mapSegment;
+	private PlaneSegment m_planeSegment;
 
 	void Start () {
-		m_mapSegment = transform.parent.GetComponent<MapSegment> ();
-		m_mapSegment.allBlocks.Push (this);
-		if (m_mapSegment.plane == Game.staticRef.planeManager.activePlane) {
+		m_planeSegment = transform.parent.GetComponent<PlaneSegment> ();
+		m_planeSegment.allBlocks.Push (this);
+		if (m_planeSegment.plane == Game.staticRef.planeManager.activePlane) {
 			m_currentState = PlaneState.Active;
 		}
-		else if (m_mapSegment.plane == Game.staticRef.planeManager.primedPlane) {
+		else if (m_planeSegment.plane == Game.staticRef.planeManager.primedPlane) {
 			m_currentState = PlaneState.Primed;
 		}
 		else {

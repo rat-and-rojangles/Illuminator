@@ -85,4 +85,11 @@ public class PlayerCharacter : MonoBehaviour {
 			rb.velocity = new Vector3 (0f, -1f, Random.Range (-10, -5));
 		}
 	}
+
+	[ContextMenu ("EnableKinematic")]
+	private void EnableKinematic () {
+		foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody> ()) {
+			rb.isKinematic = true;
+		}
+	}
 }

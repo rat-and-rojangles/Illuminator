@@ -65,12 +65,6 @@ public class PlaneManager : MonoBehaviour {
 		primedPlane.ApplyState ();
 	}
 
-	public void RemoveLastMapSegment () {
-		foreach (Plane p in planes) {
-			p.mapSegments.Dequeue ();
-		}
-	}
-
 	private void ApplyColors () {
 		activeMaterial.color = planes [currentActiveIndex].color;
 		primedMaterial.color = planes [currentPrimedIndex].color;
