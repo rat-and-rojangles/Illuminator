@@ -28,22 +28,21 @@ public class PlayerCharacter : MonoBehaviour {
 
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update () {
-		if (Input.GetButtonDown ("Swap")) {
-			Game.staticRef.planeManager.Swap ();
-		}
+
 
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
 
 		float horizontalInput = Input.GetAxis ("Horizontal");
+
 		if (horizontalInput > 0.1f) {
 			transform.rotation = Quaternion.Euler (Vector3.zero);
-			velocity.x = runSpeed + Game.staticRef.AUTO_SCROLL_RATE;
+			velocity.x = horizontalInput * runSpeed + Game.staticRef.AUTO_SCROLL_RATE;
 		}
 		else if (horizontalInput < -0.1f) {
 			transform.rotation = Quaternion.Euler (0f, 180f, 0f);
-			velocity.x = -runSpeed;
+			velocity.x = horizontalInput * runSpeed;
 		}
 		else {
 			velocity.x = 0f;
@@ -51,7 +50,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 		// we can only jump from the ground
 		// note the kinematic formula
-		if (controller.isGrounded && Input.GetAxis ("Vertical") > 0.1f) {
+		if (controller.isGrounded && Input.GetButton ("Jump")) {
 			velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 			animator.SetTrigger (Animator.StringToHash ("Jump"));
 		}
@@ -69,6 +68,9 @@ public class PlayerCharacter : MonoBehaviour {
 
 		if (transform.position.y < -20f) {
 			DieFromFall ();
+		}
+		if (Input.GetButtonDown ("Swap")) {
+			Game.staticRef.planeManager.Swap ();
 		}
 	}
 

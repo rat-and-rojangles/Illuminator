@@ -41,7 +41,7 @@ public class Game : MonoBehaviour {
 
 
 	private static float HALT_DURATION {
-		get { return 1f; }
+		get { return 1.5f; }
 	}
 	private static InterpolationMethod HALT_INTERP_METHOD {
 		get { return InterpolationMethod.SquareRoot; }
@@ -54,7 +54,9 @@ public class Game : MonoBehaviour {
 		float originalScrollRate = AUTO_SCROLL_RATE;
 		while (timeElapsed <= HALT_DURATION) {
 			timeElapsed += Time.deltaTime;
-			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, timeElapsed / HALT_DURATION, HALT_INTERP_METHOD);
+			float ratio = timeElapsed / HALT_DURATION;
+			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, ratio, HALT_INTERP_METHOD);
+			MusicMaster.staticRef.lowPassFilter.cutoffFrequency = Interpolation.Interpolate (22000f, MusicMaster.staticRef.lowPassMinCutoff, ratio, HALT_INTERP_METHOD);
 			yield return null;
 		}
 		loseScreen.SetActive (true);
