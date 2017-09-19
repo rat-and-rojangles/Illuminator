@@ -9,7 +9,9 @@ public class PlaneSegmentSpawner : MonoBehaviour {
 	[SerializeField]
 	private GameObject [] segmentsAvailable;
 
-	public static float SPAWN_BOUNDARY_X = 20f;
+
+	[SerializeField]
+	private float SPAWN_BOUNDARY_X = 20f;
 
 	void LateUpdate () {
 		for (int x = 0; x < Game.staticRef.planeManager.planes.Length; x++) {
@@ -20,16 +22,18 @@ public class PlaneSegmentSpawner : MonoBehaviour {
 				GameObject.Destroy (seg.gameObject);
 			}
 
-			// Spawn new
+			// spawn new
 			float furthestRight = Game.staticRef.planeManager.planes [x].planeSegments.Peek ().transform.position.x;
 			foreach (PlaneSegment ps in Game.staticRef.planeManager.planes [x].planeSegments) {
 				furthestRight += ps.width;
 			}
-			if (furthestRight < SPAWN_BOUNDARY_X) {
+			while (furthestRight < SPAWN_BOUNDARY_X) {
 				GameObject newSegment = GameObject.Instantiate (segmentsAvailable.RandomElement (), transform, true);
 				newSegment.name = "PlaneSegment";
 				newSegment.transform.position = Vector3.right * furthestRight;
-				newSegment.GetComponent<PlaneSegment> ().planeIndex = x;
+				PlaneSegment newSegComponent = newSegment.GetComponent<PlaneSegment> ();
+				newSegComponent.planeIndex = x;
+				furthestRight += newSegComponent.width;
 			}
 		}
 	}

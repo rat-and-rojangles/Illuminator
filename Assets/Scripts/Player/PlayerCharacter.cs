@@ -26,10 +26,7 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 
-	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update () {
-
-
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
@@ -69,6 +66,9 @@ public class PlayerCharacter : MonoBehaviour {
 		if (transform.position.y < -20f) {
 			DieFromFall ();
 		}
+		else if (transform.position.x < -12f) {
+			DieFromFall ();
+		}
 		if (Input.GetButtonDown ("Swap")) {
 			Game.staticRef.planeManager.Swap ();
 		}
@@ -82,6 +82,7 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	public void DieFromSlam () {
+		Game.staticRef.scoreCounter.continueUpdating = false;
 		animator.enabled = false;
 		controller.enabled = false;
 		this.enabled = false;
@@ -93,6 +94,7 @@ public class PlayerCharacter : MonoBehaviour {
 		StartCoroutine (Game.staticRef.Halt ());
 	}
 	public void DieFromFall () {
+		Game.staticRef.scoreCounter.continueUpdating = false;
 		controller.enabled = false;
 		this.enabled = false;
 		StartCoroutine (Game.staticRef.Halt ());

@@ -37,10 +37,9 @@ public class PlaneManager : MonoBehaviour {
 	void Awake () {
 		m_planes = new Plane [planesInThisLevel];
 
-		float baseHue = Random.value;
+		float baseHue = PlayerPrefs.GetFloat ("CharacterHue", 0f);
 		for (int x = 0; x < planesInThisLevel; x++) {
-			//planes [x] = new Plane (Random.ColorHSV ());
-			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + x * 1.0f / planesInThisLevel), 1, 1));
+			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + (x + 1) * 1.0f / (planesInThisLevel + 1)), 1, 1));
 		}
 	}
 

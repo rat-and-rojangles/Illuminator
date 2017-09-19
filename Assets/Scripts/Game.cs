@@ -19,13 +19,20 @@ public class Game : MonoBehaviour {
 		get { return m_planeManager; }
 	}
 
-	[SerializeField]
 	private PlayerCharacter m_player;
 	public PlayerCharacter player {
 		get { return m_player; }
 	}
 
+	[SerializeField]
+	private ScoreCounter m_scoreCounter;
+	public ScoreCounter scoreCounter {
+		get { return m_scoreCounter; }
+	}
 
+
+	[SerializeField]
+	private bool checkPrefsForSpeed = true;
 	/// <summary>
 	/// Rate at which the level scrolls.
 	/// </summary>
@@ -39,6 +46,12 @@ public class Game : MonoBehaviour {
 		m_staticRef = null;
 	}
 
+	void Start () {
+		if (checkPrefsForSpeed) {
+			AUTO_SCROLL_RATE = PlayerPrefs.GetFloat ("Speed", 8f);
+		}
+		m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
+	}
 
 	private static float HALT_DURATION {
 		get { return 1.5f; }
@@ -50,19 +63,34 @@ public class Game : MonoBehaviour {
 	/// Gradually halt the level auto scroll.
 	/// </summary>
 	public IEnumerator Halt () {
+		MusicMaster.staticRef.HaltMusic (HALT_DURATION, HALT_INTERP_METHOD);
+		Transform cam = Camera.main.transform.parent.transform;
 		float timeElapsed = 0f;
 		float originalScrollRate = AUTO_SCROLL_RATE;
 		while (timeElapsed <= HALT_DURATION) {
 			timeElapsed += Time.deltaTime;
 			float ratio = timeElapsed / HALT_DURATION;
 			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, ratio, HALT_INTERP_METHOD);
-			MusicMaster.staticRef.lowPassFilter.cutoffFrequency = Interpolation.Interpolate (22000f, MusicMaster.staticRef.lowPassMinCutoff, ratio, HALT_INTERP_METHOD);
+			float eulerZ = Interpolation.Interpolate (0f, 5f, ratio, HALT_INTERP_METHOD);
+			cam.eulerAngles = new Vector3 (0f, 0f, eulerZ);
 			yield return null;
 		}
 		loseScreen.SetActive (true);
-		while (!Input.GetButton ("Swap")) {
-			yield return null;
+		bool waitingToExit = true;
+		while (waitingToExit) {
+			if (Input.GetButtonDown ("Swap")) {
+				waitingToExit = false;
+				MusicMaster.staticRef.FadeInMusic (1f, HALT_INTERP_METHOD);
+				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+			}
+			else if (Input.GetKeyDown (KeyCode.Backspace)) {
+				waitingToExit = false;
+				SceneManager.LoadScene (0);
+			}
+			else {
+				yield return null;
+			}
 		}
-		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+
 	}
 }

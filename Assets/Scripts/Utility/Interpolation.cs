@@ -35,7 +35,7 @@ public static class Interpolation {
 	/// Interpolate between 2 floats with a specified interpolation method.
 	/// </summary>
 	public static float Interpolate (float a, float b, float t, InterpolationMethod method) {
-		return Mathf.Lerp (a, b, TimeScale (t, method));
+		return Mathf.Lerp (a, b, (TimeScale (t, method)));
 	}
 
 	/// <summary>
