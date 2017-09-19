@@ -80,7 +80,7 @@ public class Game : MonoBehaviour {
 		while (waitingToExit) {
 			if (Input.GetButtonDown ("Swap")) {
 				waitingToExit = false;
-				MusicMaster.staticRef.FadeInMusic (1f, HALT_INTERP_METHOD);
+				MusicMaster.staticRef.FadeInMusic (0.25f, HALT_INTERP_METHOD);
 				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 			}
 			else if (Input.GetKeyDown (KeyCode.Backspace)) {

@@ -17,7 +17,7 @@ Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_
 Loading C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.175 seconds
+- Completed reload, in  0.261 seconds
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
