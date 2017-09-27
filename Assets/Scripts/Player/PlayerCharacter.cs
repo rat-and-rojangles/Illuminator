@@ -51,7 +51,7 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	void Update () {
-		swapThisFrame = Input.GetButtonDown ("Swap");
+		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
 	}
 
 	void FixedUpdate () {
