@@ -17,9 +17,68 @@ Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_
 Loading C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.261 seconds
+- Completed reload, in  0.141 seconds
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Public\Documents\Unity Projects\RunForIt\Builds\Run_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 1.446735 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 7.681264 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+
+Unloading 82 unused Assets to reduce memory usage. Loaded Objects now: 3435.
+Total: 1.288763 ms (FindLiveObjects: 0.154401 ms CreateObjectMapping: 0.112008 ms MarkObjects: 0.467221 ms  DeleteObjects: 0.554239 ms)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.784099 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 3435.
+Total: 0.766653 ms (FindLiveObjects: 0.178945 ms CreateObjectMapping: 0.102637 ms MarkObjects: 0.475700 ms  DeleteObjects: 0.008478 ms)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.220083 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 3435.
+Total: 0.756390 ms (FindLiveObjects: 0.186531 ms CreateObjectMapping: 0.103529 ms MarkObjects: 0.457850 ms  DeleteObjects: 0.008032 ms)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.955458 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 3435.
+Total: 0.765761 ms (FindLiveObjects: 0.167789 ms CreateObjectMapping: 0.103083 ms MarkObjects: 0.485071 ms  DeleteObjects: 0.008924 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.747994 ms
+Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Audio).
+ 
+(Filename:  Line: 623)
+
+
+Unloading 1259 unused Assets to reduce memory usage. Loaded Objects now: 1650.
+Total: 1.224504 ms (FindLiveObjects: 0.166450 ms CreateObjectMapping: 0.115131 ms MarkObjects: 0.422150 ms  DeleteObjects: 0.519878 ms)
+
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: d00 -> priority: 1 
+  Thread -> id: 210c -> priority: 1 

@@ -35,4 +35,20 @@ public static class CustomExtensions {
 		float zPrime = z == null ? t.localPosition.z : z.GetValueOrDefault ();
 		t.localPosition += -t.localPosition + new Vector3 (xPrime, yPrime, zPrime);
 	}
+
+	/// <summary>
+	/// returns 1 if positive, -1 if negative, 0 if zero. epsilon = 0.000001f
+	/// </summary>
+	public static int Sign (this float x) {
+		float epsilon = 0.000001f;
+		if (x > epsilon) {
+			return 1;
+		}
+		else if (x < -epsilon) {
+			return -1;
+		}
+		else {
+			return 0;
+		}
+	}
 }

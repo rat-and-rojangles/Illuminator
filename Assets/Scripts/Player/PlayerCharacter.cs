@@ -4,61 +4,108 @@ using Prime31;
 
 
 public class PlayerCharacter : MonoBehaviour {
-	// movement config
-	public float gravity = -25f;
-	public float runSpeed = 8f;
-	public float jumpHeight = 3f;
+	/// <summary>
+	/// This much subtracted from velocity per second.
+	/// </summary>
+	[SerializeField]
+	private float gravity = -56.25f;
+	[SerializeField]
+	private float runSpeed = 8f;
+	[SerializeField]
+	private float jumpHeight = 3.5f;
+	[SerializeField]
+	private float fallSpeedCutoff = -26.25f;
+	/// <summary>
+	/// The character walks for this long before reaching starting to run. (1/10 of normal run speed)
+	/// </summary>
+	[SerializeField]
+	private float runAccelerationTime = 0.15f;
+
+	private float timeUntilFullRunSpeed = 0f;
 
 	private CharacterController2D controller;
 
 	[SerializeField]
 	private Animator animator;
-	private Vector3 velocity;
+	private Vector3 velocity = Vector2.zero;
 
 	[SerializeField]
 	private PlayerHurtbox hurtbox;
 
+	private bool swapThisFrame = false;
+
 	private Rigidbody [] ragdollBodies;
+
+	/// <summary>
+	/// Derived vertical velocity from jumping
+	/// </summary>
+	/// <returns></returns>
+	private float jumpVelocity {
+		get { return Mathf.Sqrt (2f * jumpHeight * -gravity); }
+	}
 
 	void Awake () {
 		controller = GetComponent<CharacterController2D> ();
 		ragdollBodies = GetComponentsInChildren<Rigidbody> ();
+		timeUntilFullRunSpeed = runAccelerationTime;
 	}
 
-
 	void Update () {
+		swapThisFrame = Input.GetButtonDown ("Swap");
+	}
+
+	void FixedUpdate () {
 		if (controller.isGrounded) {
 			velocity.y = 0;
-		}
-
-		float horizontalInput = Input.GetAxis ("Horizontal");
-
-		if (horizontalInput > 0.1f) {
-			transform.rotation = Quaternion.Euler (Vector3.zero);
-			velocity.x = horizontalInput * runSpeed + Game.staticRef.AUTO_SCROLL_RATE;
-		}
-		else if (horizontalInput < -0.1f) {
-			transform.rotation = Quaternion.Euler (0f, 180f, 0f);
-			velocity.x = horizontalInput * runSpeed;
-		}
-		else {
-			velocity.x = 0f;
 		}
 
 		// we can only jump from the ground
 		// note the kinematic formula
 		if (controller.isGrounded && Input.GetButton ("Jump")) {
-			velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
+			velocity.y = jumpVelocity;
 			animator.SetTrigger (Animator.StringToHash ("Jump"));
+			timeUntilFullRunSpeed = -1f;
+		}
+		// short hop
+		else if (Input.GetButtonUp ("Jump") && !controller.isGrounded) {
+			if (velocity.y > jumpVelocity * 0.5f) {
+				velocity.y = jumpVelocity * 0.5f;
+			}
+		}
+
+		float horizontalInput = Input.GetAxis ("Horizontal");
+		float derivedRunSpeed = horizontalInput * runSpeed;
+
+
+		if (controller.isGrounded && horizontalInput.Sign () != velocity.x.Sign ()) {
+			timeUntilFullRunSpeed = runAccelerationTime;
+		}
+		if (timeUntilFullRunSpeed > 0f) {
+			derivedRunSpeed *= 0.1f;
+			timeUntilFullRunSpeed -= Time.fixedDeltaTime;
+		}
+
+		if (horizontalInput > 0.1f) {
+			transform.rotation = Quaternion.Euler (Vector3.zero);
+			velocity.x = derivedRunSpeed + Game.staticRef.AUTO_SCROLL_RATE;
+		}
+		else if (horizontalInput < -0.1f) {
+			transform.rotation = Quaternion.Euler (0f, 180f, 0f);
+			velocity.x = derivedRunSpeed;
+		}
+		else {
+			timeUntilFullRunSpeed = runAccelerationTime;
+			velocity.x = 0f;
 		}
 
 		animator.SetFloat (Animator.StringToHash ("Speed"), Mathf.Abs (velocity.x));
 		animator.SetBool (Animator.StringToHash ("Grounded"), controller.isGrounded);
 
 		// apply gravity before moving
-		velocity.y += gravity * Time.deltaTime;
+		//velocity.y += gravity * Time.fixedDeltaTime;
+		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.fixedDeltaTime, fallSpeedCutoff, Mathf.Infinity);
 
-		controller.move (velocity * Time.deltaTime);
+		controller.move (velocity * Time.fixedDeltaTime);
 
 		// grab our current _velocity to use as a base for all calculations
 		velocity = controller.velocity;
@@ -69,8 +116,9 @@ public class PlayerCharacter : MonoBehaviour {
 		else if (transform.position.x < -12f) {
 			DieFromFall ();
 		}
-		if (Input.GetButtonDown ("Swap")) {
+		if (swapThisFrame) {
 			Game.staticRef.planeManager.Swap ();
+			swapThisFrame = false;
 		}
 	}
 

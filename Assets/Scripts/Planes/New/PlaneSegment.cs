@@ -12,6 +12,8 @@ public class PlaneSegment : MonoBehaviour {
 	/// </summary>
 	public Stack<Block> allBlocks = new Stack<Block> ();
 
+	private int blockCount = 0;
+
 	/// <summary>
 	/// The plane this segment is a part of.
 	/// </summary>
@@ -37,6 +39,16 @@ public class PlaneSegment : MonoBehaviour {
 		}
 		foreach (Block b in allBlocks) {
 			b.state = plane.state;
+		}
+	}
+
+	/// <summary>
+	/// Use this when a block goes offscreen. If all blocks are forgotten, it's time to despawn this.
+	/// </summary>
+	public void ForgetBlock () {
+		blockCount++;
+		if (blockCount == allBlocks.Count) {
+			//
 		}
 	}
 }
