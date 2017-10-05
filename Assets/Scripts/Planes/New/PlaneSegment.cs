@@ -47,8 +47,9 @@ public class PlaneSegment : MonoBehaviour {
 	/// </summary>
 	public void ForgetBlock () {
 		blockCount++;
-		if (blockCount == allBlocks.Count) {
-			//
+		// Game.staticRef != null is so that this does't happen on scene restarting 
+		if (blockCount == allBlocks.Count && Game.staticRef != null) {
+			Game.staticRef.planeManager.DespawnOldestSegment (planeIndex);
 		}
 	}
 }

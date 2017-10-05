@@ -32,6 +32,8 @@ public class WoodMan : MonoBehaviour {
 	[SerializeField]
 	private PlayerHurtbox hurtbox;
 
+	private bool swapThisFrame = false;
+
 	private Rigidbody [] ragdollBodies;
 
 	/// <summary>
@@ -48,8 +50,11 @@ public class WoodMan : MonoBehaviour {
 		timeUntilFullRunSpeed = runAccelerationTime;
 	}
 
-
 	void Update () {
+		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
+	}
+
+	void FixedUpdate () {
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
@@ -58,7 +63,7 @@ public class WoodMan : MonoBehaviour {
 		// note the kinematic formula
 		if (controller.isGrounded && Input.GetButton ("Jump")) {
 			velocity.y = jumpVelocity;
-			animator.SetTrigger (Animator.StringToHash ("Jump"));
+			//animator.SetTrigger (Animator.StringToHash ("Jump"));
 			timeUntilFullRunSpeed = -1f;
 		}
 		// short hop
@@ -77,13 +82,12 @@ public class WoodMan : MonoBehaviour {
 		}
 		if (timeUntilFullRunSpeed > 0f) {
 			derivedRunSpeed *= 0.1f;
-			timeUntilFullRunSpeed -= Time.deltaTime;
+			timeUntilFullRunSpeed -= Time.fixedDeltaTime;
 		}
 
 		if (horizontalInput > 0.1f) {
 			transform.rotation = Quaternion.Euler (Vector3.zero);
-			//velocity.x = horizontalInput * runSpeed + Game.staticRef.AUTO_SCROLL_RATE;
-			velocity.x = derivedRunSpeed;
+			velocity.x = derivedRunSpeed + 0;
 		}
 		else if (horizontalInput < -0.1f) {
 			transform.rotation = Quaternion.Euler (0f, 180f, 0f);
@@ -94,27 +98,29 @@ public class WoodMan : MonoBehaviour {
 			velocity.x = 0f;
 		}
 
-		animator.SetFloat (Animator.StringToHash ("Speed"), Mathf.Abs (velocity.x));
-		animator.SetBool (Animator.StringToHash ("Grounded"), controller.isGrounded);
+		//animator.SetFloat (Animator.StringToHash ("Speed"), Mathf.Abs (velocity.x));
+		//animator.SetBool (Animator.StringToHash ("Grounded"), controller.isGrounded);
 
 		// apply gravity before moving
-		velocity.y += gravity * Time.deltaTime;
+		//velocity.y += gravity * Time.fixedDeltaTime;
+		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.fixedDeltaTime, fallSpeedCutoff, Mathf.Infinity);
 
-		controller.move (velocity * Time.deltaTime);
+		controller.move (velocity * Time.fixedDeltaTime);
+		AnimationUpdate ();
 
 		// grab our current _velocity to use as a base for all calculations
 		velocity = controller.velocity;
 
-		/*
 		if (transform.position.y < -20f) {
 			DieFromFall ();
 		}
 		else if (transform.position.x < -12f) {
 			DieFromFall ();
 		}
-		if (Input.GetButtonDown ("Swap")) {
-			Game.staticRef.planeManager.Swap ();
-		} */
+		if (swapThisFrame) {
+			//Game.staticRef.planeManager.Swap ();
+			swapThisFrame = false;
+		}
 	}
 
 	/// <summary>
@@ -122,6 +128,23 @@ public class WoodMan : MonoBehaviour {
 	/// </summary>
 	public bool SlamCheck () {
 		return hurtbox.withinTrigger;
+	}
+
+	private void AnimationUpdate () {
+		if (!controller.isGrounded) {
+			animator.Play ("Fall");
+		}
+		else if (velocity.x.Sign () == 0) {
+			animator.Play ("Idle");
+		}
+		else {
+			if (timeUntilFullRunSpeed > 0f) {
+				animator.Play ("Idle");
+			}
+			else {
+				animator.Play ("Run");
+			}
+		}
 	}
 
 	public void DieFromSlam () {

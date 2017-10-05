@@ -50,6 +50,10 @@ public class PlayerCharacter : MonoBehaviour {
 		timeUntilFullRunSpeed = runAccelerationTime;
 	}
 
+	void OnBecameInvisible () {
+		print ("disappeared");
+	}
+
 	void Update () {
 		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
 	}
@@ -63,7 +67,6 @@ public class PlayerCharacter : MonoBehaviour {
 		// note the kinematic formula
 		if (controller.isGrounded && Input.GetButton ("Jump")) {
 			velocity.y = jumpVelocity;
-			animator.SetTrigger (Animator.StringToHash ("Jump"));
 			timeUntilFullRunSpeed = -1f;
 		}
 		// short hop
@@ -79,6 +82,9 @@ public class PlayerCharacter : MonoBehaviour {
 
 		if (controller.isGrounded && horizontalInput.Sign () != velocity.x.Sign ()) {
 			timeUntilFullRunSpeed = runAccelerationTime;
+		}
+		else if (!controller.isGrounded) {
+			timeUntilFullRunSpeed = -1f;
 		}
 		if (timeUntilFullRunSpeed > 0f) {
 			derivedRunSpeed *= 0.1f;
@@ -98,14 +104,12 @@ public class PlayerCharacter : MonoBehaviour {
 			velocity.x = 0f;
 		}
 
-		animator.SetFloat (Animator.StringToHash ("Speed"), Mathf.Abs (velocity.x));
-		animator.SetBool (Animator.StringToHash ("Grounded"), controller.isGrounded);
-
 		// apply gravity before moving
 		//velocity.y += gravity * Time.fixedDeltaTime;
 		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.fixedDeltaTime, fallSpeedCutoff, Mathf.Infinity);
 
 		controller.move (velocity * Time.fixedDeltaTime);
+		AnimationUpdate ();
 
 		// grab our current _velocity to use as a base for all calculations
 		velocity = controller.velocity;
@@ -119,6 +123,23 @@ public class PlayerCharacter : MonoBehaviour {
 		if (swapThisFrame) {
 			Game.staticRef.planeManager.Swap ();
 			swapThisFrame = false;
+		}
+	}
+
+	private void AnimationUpdate () {
+		if (!controller.isGrounded) {
+			animator.Play ("Fall");
+		}
+		else if (velocity.x.Sign () == 0) {
+			animator.Play ("Idle");
+		}
+		else {
+			if (timeUntilFullRunSpeed > 0f) {
+				animator.Play ("Idle");
+			}
+			else {
+				animator.Play ("Run");
+			}
 		}
 	}
 

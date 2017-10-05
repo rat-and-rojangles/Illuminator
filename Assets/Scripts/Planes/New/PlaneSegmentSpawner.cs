@@ -15,13 +15,6 @@ public class PlaneSegmentSpawner : MonoBehaviour {
 
 	void LateUpdate () {
 		for (int x = 0; x < Game.staticRef.planeManager.planes.Length; x++) {
-			// Despawn old
-			PlaneSegment seg = Game.staticRef.planeManager.planes [x].planeSegments.Peek ();
-			if (seg.transform.position.x + seg.width < -SPAWN_BOUNDARY_X) {
-				Game.staticRef.planeManager.planes [x].planeSegments.Dequeue ();
-				GameObject.Destroy (seg.gameObject);
-			}
-
 			// spawn new
 			float furthestRight = Game.staticRef.planeManager.planes [x].planeSegments.Peek ().transform.position.x;
 			foreach (PlaneSegment ps in Game.staticRef.planeManager.planes [x].planeSegments) {

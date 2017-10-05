@@ -63,6 +63,12 @@ public class PlaneManager : MonoBehaviour {
 		primedPlane.ApplyState ();
 	}
 
+	
+	public void DespawnOldestSegment (int planeIndex) {
+		PlaneSegment rip = Game.staticRef.planeManager.planes [planeIndex].planeSegments.Dequeue ();
+		GameObject.Destroy (rip.gameObject, 0.1f);
+	}
+
 	private void ApplyColors () {
 		activeMaterial.color = planes [currentActiveIndex].color;
 		primedMaterial.color = planes [currentPrimedIndex].color;
