@@ -7,26 +7,39 @@ using UnityEngine;
 /// </summary>
 public class PlaneSegmentSpawner : MonoBehaviour {
 	[SerializeField]
-	private GameObject [] segmentsAvailable;
-
-
+	private GameObject [] possibleSegments;
 	[SerializeField]
-	private float SPAWN_BOUNDARY_X = 20f;
+	private GameObject [] impossibleSegments;
 
 	void LateUpdate () {
 		for (int x = 0; x < Game.staticRef.planeManager.planes.Length; x++) {
-			// spawn new
-			float furthestRight = Game.staticRef.planeManager.planes [x].planeSegments.Peek ().transform.position.x;
-			foreach (PlaneSegment ps in Game.staticRef.planeManager.planes [x].planeSegments) {
-				furthestRight += ps.width;
+			//despawn oldest
+			PlaneSegment current = Game.staticRef.planeManager.planes [x].planeSegments.Peek ();
+			while (current.rightEdge < Game.staticRef.leftBoundary) {
+				Game.staticRef.planeManager.planes [x].PopSegment ();
+				current = Game.staticRef.planeManager.planes [x].planeSegments.Peek ();
 			}
-			while (furthestRight < SPAWN_BOUNDARY_X) {
-				GameObject newSegment = GameObject.Instantiate (segmentsAvailable.RandomElement (), transform, true);
-				newSegment.name = "PlaneSegment";
-				newSegment.transform.position = Vector3.right * furthestRight;
-				PlaneSegment newSegComponent = newSegment.GetComponent<PlaneSegment> ();
+
+			//Spawn newest
+			float furthestRightEdge = Game.staticRef.planeManager.planes [x].planeSegments.Peek ().leftEdge;
+			foreach (PlaneSegment ps in Game.staticRef.planeManager.planes [x].planeSegments) {
+				furthestRightEdge += ps.width;
+			}
+			while (furthestRightEdge < Game.staticRef.rightSpawnBoundary) {
+				GameObject [] selectedCollection;
+				if (furthestRightEdge < Game.staticRef.planeManager.planes [x.Other ()].furthestImpossibleRightEdge || Random.value < 0.5f) {
+					selectedCollection = possibleSegments;
+				}
+				else {
+					selectedCollection = impossibleSegments;
+				}
+
+				GameObject newSegObject = GameObject.Instantiate (selectedCollection.RandomElement (), Vector3.right * furthestRightEdge, Quaternion.identity);
+				newSegObject.transform.parent = this.transform;
+				PlaneSegment newSegComponent = newSegObject.GetComponent<PlaneSegment> ();
 				newSegComponent.planeIndex = x;
-				furthestRight += newSegComponent.width;
+				newSegComponent.Initialize ();
+				furthestRightEdge += newSegComponent.width;
 			}
 		}
 	}

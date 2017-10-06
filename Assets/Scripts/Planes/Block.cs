@@ -65,11 +65,7 @@ public class Block : MonoBehaviour {
 		}
 		state = m_currentState;
 	}
-
-	void OnBecameInvisible () {
-		m_planeSegment.ForgetBlock ();
-	}
-
+	
 	private IEnumerator SlideIntoPlace () {
 		float timeElapsed = 0f;
 		transform.SetLocalPosition (null, null, 1f);

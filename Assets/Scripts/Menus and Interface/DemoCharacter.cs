@@ -14,6 +14,12 @@ public class DemoCharacter : MonoBehaviour {
 		SetIndex (PlayerPrefs.GetInt ("PlayerTypeIndex", 0));
 	}
 
+	void Update () {
+		if (Input.GetButtonDown ("Swap")) {
+			Game.staticRef.planeManager.Swap ();
+		}
+	}
+
 	public void SetIndex (int index) {
 		if (index != m_currentIndex) {
 			m_currentIndex = index;

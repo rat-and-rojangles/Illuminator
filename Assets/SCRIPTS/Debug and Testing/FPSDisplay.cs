@@ -22,8 +22,6 @@ public class FPSDisplay : MonoBehaviour {
 		deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
 	}
 	void OnGUI () {
-		float msec = deltaTime * 1000.0f;
-		float fps = 1.0f / deltaTime;
 		string text = string.Format ("Update: {0:0.0} ms ({1:0.} fps)", deltaTime * 1000.0f, 1 / deltaTime) + "\n" + string.Format ("FixedUpdate: {0:0.0} ms ({1:0.} fps)", fixedDeltaTime * 1000.0f, 1 / fixedDeltaTime);
 		GUI.Label (rect, text, style);
 	}

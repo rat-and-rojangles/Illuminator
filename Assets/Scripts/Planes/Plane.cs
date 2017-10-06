@@ -24,6 +24,21 @@ public class Plane {
 		get { return m_planeSegments; }
 	}
 
+	private PlaneSegment lastImpossible;
+	/// <summary>
+	/// X coordinate for the end of the newest impossible segment. No new impossible segments can be placed before it.
+	/// </summary>
+	public float furthestImpossibleRightEdge {
+		get {
+			if (lastImpossible == null) {
+				return Mathf.NegativeInfinity;
+			}
+			else {
+				return lastImpossible.transform.position.x + lastImpossible.width + 0.5f;
+			}
+		}
+	}
+
 	public PlaneState state {
 		get {
 			if (Game.staticRef.planeManager.activePlane == this) {
@@ -36,6 +51,27 @@ public class Plane {
 				return PlaneState.Shelved;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Register a new plane segment to the right end of this plane.
+	/// </summary>
+	public void PushSegment (PlaneSegment segment) {
+		if (!segment.possible) {
+			lastImpossible = segment;
+		}
+		planeSegments.Enqueue (segment);
+	}
+
+	/// <summary>
+	/// Remove the leftmost segment.
+	/// </summary>
+	public void PopSegment () {
+		PlaneSegment ps = planeSegments.Dequeue ();
+		if (lastImpossible == ps) {
+			lastImpossible = null;
+		}
+		GameObject.Destroy (ps.gameObject);
 	}
 
 	public void ApplyState () {

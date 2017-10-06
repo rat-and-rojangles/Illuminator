@@ -3,7 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneSegment : MonoBehaviour {
-	public float width;
+	[SerializeField]
+	private float m_width;
+	public float width {
+		get { return m_width; }
+	}
+
+	public float leftEdge {
+		get { return transform.position.x; }
+	}
+	public float rightEdge {
+		get { return leftEdge + width; }
+	}
 
 	public int planeIndex;
 
@@ -12,8 +23,6 @@ public class PlaneSegment : MonoBehaviour {
 	/// </summary>
 	public Stack<Block> allBlocks = new Stack<Block> ();
 
-	private int blockCount = 0;
-
 	/// <summary>
 	/// The plane this segment is a part of.
 	/// </summary>
@@ -21,9 +30,26 @@ public class PlaneSegment : MonoBehaviour {
 		get { return Game.staticRef.planeManager.planes [planeIndex]; }
 	}
 
+	[SerializeField]
+	private bool m_possible;
+	/// <summary>
+	/// Can the player cross this without flipping planes?
+	/// </summary>
+	public bool possible {
+		get { return m_possible; }
+	}
+
+	private bool initializedAlready = false;
 	void Start () {
-		plane.planeSegments.Enqueue (this);
+		if (!initializedAlready) {
+			Initialize ();
+		}
+	}
+
+	public void Initialize () {
+		plane.PushSegment (this);
 		ApplyState ();
+		initializedAlready = true;
 	}
 
 	private void SetTransformZ (float value) {
@@ -39,17 +65,6 @@ public class PlaneSegment : MonoBehaviour {
 		}
 		foreach (Block b in allBlocks) {
 			b.state = plane.state;
-		}
-	}
-
-	/// <summary>
-	/// Use this when a block goes offscreen. If all blocks are forgotten, it's time to despawn this.
-	/// </summary>
-	public void ForgetBlock () {
-		blockCount++;
-		// Game.staticRef != null is so that this does't happen on scene restarting 
-		if (blockCount == allBlocks.Count && Game.staticRef != null) {
-			Game.staticRef.planeManager.DespawnOldestSegment (planeIndex);
 		}
 	}
 }

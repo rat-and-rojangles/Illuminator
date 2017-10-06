@@ -39,7 +39,7 @@ public class PlaneManager : MonoBehaviour {
 
 		float baseHue = PlayerPrefs.GetFloat ("CharacterHue", 0f);
 		for (int x = 0; x < planesInThisLevel; x++) {
-			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + (x + 1) * 1.0f / (planesInThisLevel + 1)), 1, 1));
+			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + (x + 1) * 1.0f / (planesInThisLevel + 1f)), 1f, 1f));
 		}
 	}
 
@@ -52,7 +52,7 @@ public class PlaneManager : MonoBehaviour {
 	/// </summary>
 	public void Swap () {
 		// first do a death check on player
-		if (Game.staticRef.player.SlamCheck ()) {
+		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
 			Game.staticRef.player.DieFromSlam ();
 		}
 
@@ -63,7 +63,7 @@ public class PlaneManager : MonoBehaviour {
 		primedPlane.ApplyState ();
 	}
 
-	
+
 	public void DespawnOldestSegment (int planeIndex) {
 		PlaneSegment rip = Game.staticRef.planeManager.planes [planeIndex].planeSegments.Dequeue ();
 		GameObject.Destroy (rip.gameObject, 0.1f);
@@ -71,6 +71,16 @@ public class PlaneManager : MonoBehaviour {
 
 	private void ApplyColors () {
 		activeMaterial.color = planes [currentActiveIndex].color;
+		activeMaterial.SetColor ("_EmissionColor", activeMaterial.color * 0.25f);
 		primedMaterial.color = planes [currentPrimedIndex].color;
+		primedMaterial.SetColor ("_EmissionColor", planes [currentPrimedIndex].color * 0.5f);
+	}
+
+	void Update () {
+		foreach (Plane p in planes) {
+			Vector3 start = new Vector3 (p.furthestImpossibleRightEdge, -5f, 0f);
+			Debug.DrawLine (start, start + Vector3.up * 5f, p.color);
+			print (p.furthestImpossibleRightEdge);
+		}
 	}
 }

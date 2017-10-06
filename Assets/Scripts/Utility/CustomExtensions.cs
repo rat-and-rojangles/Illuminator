@@ -51,4 +51,58 @@ public static class CustomExtensions {
 			return 0;
 		}
 	}
+
+	/// <summary>
+	/// If 0, returns 1. Else, returns 0. Intended to swap 0 and 1
+	/// </summary>
+	public static int Other (this int x) {
+		if (x == 0) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	/// <summary>
+	/// Insert an element before index 0
+	/// </summary>
+	public static void PushBeginning<T> (this List<T> list, T element) {
+		list.Insert (0, element);
+	}
+
+	/// <summary>
+	/// Remove element at index 0
+	/// </summary>
+	public static T PopBeginning<T> (this List<T> list) {
+		T temp = list [0];
+		list.RemoveAt (0);
+		return temp;
+	}
+
+	/// <summary>
+	/// Remove last element
+	/// </summary>
+	public static T PopLast<T> (this List<T> list) {
+		if (list.Count == 0) {
+			return default (T);
+		}
+		else {
+			T temp = list [list.Count - 1];
+			list.RemoveAt (list.Count - 1);
+			return temp;
+		}
+	}
+
+	/// <summary>
+	/// Last element in list
+	/// </summary>
+	public static T Last<T> (this List<T> list) {
+		if (list.Count == 0) {
+			return default (T);
+		}
+		else {
+			return list [list.Count - 1];
+		}
+	}
 }

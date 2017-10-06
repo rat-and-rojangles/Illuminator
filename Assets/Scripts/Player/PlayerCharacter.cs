@@ -53,7 +53,6 @@ public class PlayerCharacter : MonoBehaviour {
 	void OnBecameInvisible () {
 		print ("disappeared");
 	}
-
 	void Update () {
 		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
 	}
@@ -111,15 +110,13 @@ public class PlayerCharacter : MonoBehaviour {
 		controller.move (velocity * Time.fixedDeltaTime);
 		AnimationUpdate ();
 
-		// grab our current _velocity to use as a base for all calculations
+		// grab our current velocity to use as a base for all calculations
 		velocity = controller.velocity;
 
-		if (transform.position.y < -20f) {
+		if (transform.position.x < Game.staticRef.leftBoundary || transform.position.y < Game.staticRef.bottomBoundary) {
 			DieFromFall ();
 		}
-		else if (transform.position.x < -12f) {
-			DieFromFall ();
-		}
+
 		if (swapThisFrame) {
 			Game.staticRef.planeManager.Swap ();
 			swapThisFrame = false;

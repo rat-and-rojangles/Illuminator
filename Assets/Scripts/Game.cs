@@ -30,6 +30,35 @@ public class Game : MonoBehaviour {
 		get { return m_scoreCounter; }
 	}
 
+	[SerializeField]
+	private Transform boundaryObject;
+	/// <summary>
+	/// Despawn boundary for plane segments and death boundary for player.
+	/// </summary>
+	public float leftBoundary {
+		get {
+			return boundaryObject.position.x;
+		}
+	}
+
+	/// <summary>
+	/// Abyss for player.
+	/// </summary>
+	public float bottomBoundary {
+		get {
+			return boundaryObject.position.y;
+		}
+	}
+
+	/// <summary>
+	/// Right boundary where segments are spawned.
+	/// </summary>
+	public float rightSpawnBoundary {
+		get {
+			return -boundaryObject.position.x;
+		}
+	}
+
 
 	[SerializeField]
 	private bool checkPrefsForSpeed = true;

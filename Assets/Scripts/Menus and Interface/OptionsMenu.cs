@@ -20,6 +20,10 @@ public class OptionsMenu : MonoBehaviour {
 	private Material blockMaterial;
 	[SerializeField]
 	private Material audioMaterial;
+	[SerializeField]
+	private Material activeMaterial;
+	[SerializeField]
+	private Material primedMaterial;
 
 	private Stack<SpriteRenderer> spriteRenderers = null;
 	private float charHue = 0f;
@@ -57,8 +61,14 @@ public class OptionsMenu : MonoBehaviour {
 			}
 		}
 		characterMaterial.color = m_color;
+		characterMaterial.SetColor ("_EmissionColor", m_color * 0.25f);
 		fontMaterial.color = m_color;
 		blockMaterial.color = m_color;
+
+		activeMaterial.color = Color.HSVToRGB (Utility.DecimalPart (hue + 1.0f / 3f), 1f, 1f);;
+		activeMaterial.SetColor ("_EmissionColor", activeMaterial.color * 0.25f);
+		primedMaterial.color = Color.HSVToRGB (Utility.DecimalPart (hue + 2.0f / 3f), 1f, 1f);
+		primedMaterial.SetColor ("_EmissionColor", primedMaterial.color * 0.5f);
 	}
 
 	public void SetSpeed (float s) {
@@ -70,6 +80,7 @@ public class OptionsMenu : MonoBehaviour {
 
 	public void Commit () {
 		audioMaterial.color = m_color.ChangedAlpha (audioMaterial.color.a);
+		audioMaterial.SetColor ("_EmissionColor", m_color * 0.25f);
 		PlayerPrefs.SetFloat ("CharacterHue", charHue);
 		PlayerPrefs.SetFloat ("Speed", speed);
 	}
