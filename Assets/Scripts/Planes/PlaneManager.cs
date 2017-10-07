@@ -51,6 +51,7 @@ public class PlaneManager : MonoBehaviour {
 	/// Swaps the primed and active worlds.
 	/// </summary>
 	public void Swap () {
+		SoundCatalog.staticRef.PlaySwapSound ();
 		// first do a death check on player
 		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
 			Game.staticRef.player.DieFromSlam ();
@@ -74,13 +75,5 @@ public class PlaneManager : MonoBehaviour {
 		activeMaterial.SetColor ("_EmissionColor", activeMaterial.color * 0.25f);
 		primedMaterial.color = planes [currentPrimedIndex].color;
 		primedMaterial.SetColor ("_EmissionColor", planes [currentPrimedIndex].color * 0.5f);
-	}
-
-	void Update () {
-		foreach (Plane p in planes) {
-			Vector3 start = new Vector3 (p.furthestImpossibleRightEdge, -5f, 0f);
-			Debug.DrawLine (start, start + Vector3.up * 5f, p.color);
-			print (p.furthestImpossibleRightEdge);
-		}
 	}
 }

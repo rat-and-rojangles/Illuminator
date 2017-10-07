@@ -32,7 +32,12 @@ public class PlayerCharacter : MonoBehaviour {
 	[SerializeField]
 	private PlayerHurtbox hurtbox;
 
+	[SerializeField]
+	private ParticleSystem m_particleSystem;
+
 	private bool swapThisFrame = false;
+	private bool jumpThisFrame = false;
+	private bool cancelJumpThisFrame = false;
 
 	private Rigidbody [] ragdollBodies;
 
@@ -50,12 +55,36 @@ public class PlayerCharacter : MonoBehaviour {
 		timeUntilFullRunSpeed = runAccelerationTime;
 	}
 
-	void OnBecameInvisible () {
-		print ("disappeared");
+	void Start () {
+		var m = m_particleSystem.main;
+		m.customSimulationSpace = Game.staticRef.worldTransform;
+		controller.onControllerCollidedEvent += OnControllerCollide;
 	}
+
+	private Collider2D lastCollided = null;
+	void OnControllerCollide (RaycastHit2D hit) {
+		if (hit.collider != lastCollided) {
+			lastCollided = hit.collider;
+			Block other = hit.collider.transform.parent.GetComponent<Block> ();
+			if (other != null) {
+				other.StartAnimatingColor ();
+				var m = m_particleSystem.main;
+				m.startColor = other.planeSegment.plane.color;
+				//particleSystem.Simulate (0, true, false, true);
+				m_particleSystem.Play ();
+				// SoundCatalog.staticRef.PlayRandomFootstepSound ();
+			}
+		}
+	}
+
 	void Update () {
 		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
+		jumpThisFrame = jumpThisFrame || Input.GetButtonDown ("Jump");
+		jumpThisFrame = jumpThisFrame && !Input.GetButtonUp ("Jump");
+
+		cancelJumpThisFrame = cancelJumpThisFrame || Input.GetButtonUp ("Jump");
 	}
+
 
 	void FixedUpdate () {
 		if (controller.isGrounded) {
@@ -63,13 +92,16 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 
 		// we can only jump from the ground
-		// note the kinematic formula
-		if (controller.isGrounded && Input.GetButton ("Jump")) {
+		if (controller.isGrounded && jumpThisFrame) {
+			jumpThisFrame = false;
 			velocity.y = jumpVelocity;
 			timeUntilFullRunSpeed = -1f;
+			cancelJumpThisFrame = false;
+			SoundCatalog.staticRef.PlayJumpSound ();
 		}
 		// short hop
-		else if (Input.GetButtonUp ("Jump") && !controller.isGrounded) {
+		else if (cancelJumpThisFrame && !controller.isGrounded) {
+			cancelJumpThisFrame = false;
 			if (velocity.y > jumpVelocity * 0.5f) {
 				velocity.y = jumpVelocity * 0.5f;
 			}
@@ -148,6 +180,7 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	public void DieFromSlam () {
+		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		animator.enabled = false;
 		controller.enabled = false;
@@ -160,6 +193,7 @@ public class PlayerCharacter : MonoBehaviour {
 		StartCoroutine (Game.staticRef.Halt ());
 	}
 	public void DieFromFall () {
+		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		controller.enabled = false;
 		this.enabled = false;

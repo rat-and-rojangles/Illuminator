@@ -67,4 +67,15 @@ public class PlaneSegment : MonoBehaviour {
 			b.state = plane.state;
 		}
 	}
+
+	[ContextMenu ("Auto Calculate Width")]
+	private void AutoCalculateWidth () {
+		float max = Mathf.NegativeInfinity;
+		float min = Mathf.Infinity;
+		foreach (Renderer r in GetComponentsInChildren<Renderer> ()) {
+			min = Mathf.Min (r.bounds.min.x, min);
+			max = Mathf.Max (r.bounds.max.x, max);
+		}
+		m_width = Mathf.RoundToInt (max - min);
+	}
 }

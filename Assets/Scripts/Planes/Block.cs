@@ -15,6 +15,7 @@ public class Block : MonoBehaviour {
 		set {
 			transform.SetLocalPosition (null, null, 0f);
 			StopAllCoroutines ();
+			coloring = false;
 			switch (value) {
 				case PlaneState.Primed:
 					gameObject.SetActive (true);
@@ -50,6 +51,12 @@ public class Block : MonoBehaviour {
 	private MeshRenderer m_meshRenderer;
 
 	private PlaneSegment m_planeSegment;
+	/// <summary>
+	/// The plane segment this block is a part of.
+	/// </summary>
+	public PlaneSegment planeSegment {
+		get { return m_planeSegment; }
+	}
 
 	void Start () {
 		m_planeSegment = transform.parent.GetComponent<PlaneSegment> ();
@@ -65,7 +72,7 @@ public class Block : MonoBehaviour {
 		}
 		state = m_currentState;
 	}
-	
+
 	private IEnumerator SlideIntoPlace () {
 		float timeElapsed = 0f;
 		transform.SetLocalPosition (null, null, 1f);
@@ -79,4 +86,24 @@ public class Block : MonoBehaviour {
 		}
 		transform.SetLocalPosition (null, null, 0f);
 	}
+
+	public void StartAnimatingColor () {
+		if (!coloring) {
+			coloring = true;
+			StartCoroutine (StartAnimatingColorHelper ());
+		}
+	}
+
+	private bool coloring = false;
+	private IEnumerator StartAnimatingColorHelper () {
+		Renderer rend = GetComponent<Renderer> ();
+		float timeElapsed = 0f;
+		float duration = 0.5f;
+		while (timeElapsed < duration) {
+			timeElapsed += Time.deltaTime;
+			rend.material.SetColor ("_EmissionColor", rend.material.color * Interpolation.Interpolate (0.25f, 1f, timeElapsed / duration, InterpolationMethod.SquareRoot));
+			yield return null;
+		}
+	}
+
 }

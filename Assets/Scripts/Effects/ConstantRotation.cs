@@ -5,7 +5,7 @@ using UnityEngine;
 public class ConstantRotation : MonoBehaviour {
 
 	[SerializeField]
-	private Vector3 eulerPerSecond;
+	public Vector3 eulerPerSecond;
 
 	void Update () {
 		//transform.eulerAngles += eulerPerSecond * Time.deltaTime;

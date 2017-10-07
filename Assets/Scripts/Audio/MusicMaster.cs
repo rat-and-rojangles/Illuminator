@@ -81,6 +81,9 @@ public class MusicMaster : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Sets the music to start fading in for some duration.
+	/// </summary>
 	public void FadeInMusic (float duration, InterpolationMethod method) {
 		StopAllCoroutines ();
 		StartCoroutine (FadeInMusicHelper (duration, method));

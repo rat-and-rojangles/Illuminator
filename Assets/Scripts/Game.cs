@@ -41,6 +41,15 @@ public class Game : MonoBehaviour {
 		}
 	}
 
+	[SerializeField]
+	private Transform m_worldTransform;
+	/// <summary>
+	/// Reference to the transform of the moving world.
+	/// </summary>
+	public Transform worldTransform {
+		get { return m_worldTransform; }
+	}
+
 	/// <summary>
 	/// Abyss for player.
 	/// </summary>
@@ -104,12 +113,13 @@ public class Game : MonoBehaviour {
 			cam.eulerAngles = new Vector3 (0f, 0f, eulerZ);
 			yield return null;
 		}
+
 		loseScreen.SetActive (true);
 		bool waitingToExit = true;
 		while (waitingToExit) {
 			if (Input.GetButtonDown ("Swap")) {
 				waitingToExit = false;
-				MusicMaster.staticRef.FadeInMusic (0.25f, HALT_INTERP_METHOD);
+				MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
 				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 			}
 			else if (Input.GetKeyDown (KeyCode.Backspace)) {
