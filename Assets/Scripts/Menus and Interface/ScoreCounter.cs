@@ -11,8 +11,12 @@ public class ScoreCounter : MonoBehaviour {
 
 	public bool continueUpdating = true;
 
+	public float score {
+		get { return initialX - transform.position.x; }
+	}
+
 	void Awake () {
-		initialX = transform.position.x - 1f;
+		initialX = transform.position.x;
 	}
 
 	void Update () {
@@ -22,6 +26,6 @@ public class ScoreCounter : MonoBehaviour {
 	}
 
 	private void TextUpdate () {
-		textMesh.text = (initialX - transform.position.x + Game.staticRef.player.transform.position.x).ToString ("0.0") + " m";
+		textMesh.text = score.ToString ("0.0") + " m";
 	}
 }

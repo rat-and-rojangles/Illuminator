@@ -9,6 +9,9 @@ public class ShiftingHologram : MonoBehaviour {
 	private Vector2 offset = Vector2.zero;
 	public Material mat;
 
+	void Awake () {
+		Reset ();
+	}
 
 	// Update is called once per frame
 	void LateUpdate () {

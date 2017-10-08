@@ -68,6 +68,10 @@ public class Game : MonoBehaviour {
 		}
 	}
 
+	private int difficulty = 0;
+	private float [] speedByDifficulty = { 5f, 7.5f, 10f, 12.5f, 15f, 17.5f, 20f, 22.5f, 25f };
+	private float [] distanceToNextDifficulty = { 100f, 200f, 400f, 600f, 900f, 1200f, 1600f, 2000f, Mathf.Infinity };
+
 
 	[SerializeField]
 	private bool checkPrefsForSpeed = true;
@@ -85,10 +89,19 @@ public class Game : MonoBehaviour {
 	}
 
 	void Start () {
-		if (checkPrefsForSpeed) {
-			AUTO_SCROLL_RATE = PlayerPrefs.GetFloat ("Speed", 8f);
-		}
+		// if (checkPrefsForSpeed) {
+		// 	AUTO_SCROLL_RATE = PlayerPrefs.GetFloat ("Speed", 8f);
+		// }
+		AUTO_SCROLL_RATE = speedByDifficulty [0];
 		m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
+	}
+
+	void Update () {
+		if (scoreCounter.score > distanceToNextDifficulty [difficulty]) {
+			difficulty++;
+			AUTO_SCROLL_RATE = speedByDifficulty [difficulty];
+			SoundCatalog.staticRef.PlayDeathSound ();
+		}
 	}
 
 	private static float HALT_DURATION {

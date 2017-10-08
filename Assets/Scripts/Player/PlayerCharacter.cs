@@ -56,6 +56,7 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	void Start () {
+		//animator.speed = Game.staticRef.AUTO_SCROLL_RATE * 0.2f;
 		var m = m_particleSystem.main;
 		m.customSimulationSpace = Game.staticRef.worldTransform;
 		controller.onControllerCollidedEvent += OnControllerCollide;

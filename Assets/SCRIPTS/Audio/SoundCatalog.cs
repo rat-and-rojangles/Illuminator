@@ -39,7 +39,7 @@ public class SoundCatalog : MonoBehaviour {
 		audioSource.PlayOneShot (jump);
 	}
 	public void PlayDeathSound () {
-		audioSource.PlayOneShot (death);
+		audioSource.PlayOneShot (death, 5f);
 	}
 	public void PlayRandomFootstepSound () {
 		audioSource.PlayOneShot (footsteps.RandomElement ());
