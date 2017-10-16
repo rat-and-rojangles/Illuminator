@@ -52,16 +52,17 @@ public class PlaneManager : MonoBehaviour {
 	/// </summary>
 	public void Swap () {
 		SoundCatalog.staticRef.PlaySwapSound ();
-		// first do a death check on player
-		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
-			Game.staticRef.player.DieFromSlam ();
-		}
 
 		Utility.Swap (ref m_currentActiveIndex, ref m_currentPrimedIndex);
 		ApplyColors ();
 
 		activePlane.ApplyState ();
 		primedPlane.ApplyState ();
+
+		// first do a death check on player
+		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
+			Game.staticRef.player.DieFromSlam ();
+		}
 	}
 
 

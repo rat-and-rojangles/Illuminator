@@ -26,7 +26,7 @@ public static class CustomExtensions {
 	}
 
 	/// <summary>
-	/// non-disruptively set the transform position
+	/// non-disruptively set the transform local position
 	/// </summary>
 
 	public static void SetLocalPosition (this Transform t, float? x, float? y, float? z) {
@@ -34,6 +34,13 @@ public static class CustomExtensions {
 		float yPrime = y == null ? t.localPosition.y : y.GetValueOrDefault ();
 		float zPrime = z == null ? t.localPosition.z : z.GetValueOrDefault ();
 		t.localPosition += -t.localPosition + new Vector3 (xPrime, yPrime, zPrime);
+	}
+
+	/// <summary>
+	/// non-disruptively set the transform world position
+	/// </summary>
+	public static void SetPosition (this Transform transform, Vector3 position) {
+		transform.position += -transform.position + position;
 	}
 
 	/// <summary>

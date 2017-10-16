@@ -30,10 +30,10 @@ public class PlayerCharacter : MonoBehaviour {
 	private Vector3 velocity = Vector2.zero;
 
 	[SerializeField]
-	private PlayerHurtbox hurtbox;
+	private ParticleSystem m_stepParticle;
 
 	[SerializeField]
-	private ParticleSystem m_particleSystem;
+	private ParticleSystem m_deathParticle;
 
 	private bool swapThisFrame = false;
 	private bool jumpThisFrame = false;
@@ -57,8 +57,9 @@ public class PlayerCharacter : MonoBehaviour {
 
 	void Start () {
 		//animator.speed = Game.staticRef.AUTO_SCROLL_RATE * 0.2f;
-		var m = m_particleSystem.main;
+		var m = m_stepParticle.main;
 		m.customSimulationSpace = Game.staticRef.worldTransform;
+
 		controller.onControllerCollidedEvent += OnControllerCollide;
 	}
 
@@ -69,11 +70,10 @@ public class PlayerCharacter : MonoBehaviour {
 			Block other = hit.collider.transform.parent.GetComponent<Block> ();
 			if (other != null) {
 				other.StartAnimatingColor ();
-				var m = m_particleSystem.main;
+				var m = m_stepParticle.main;
 				m.startColor = other.planeSegment.plane.color;
-				//particleSystem.Simulate (0, true, false, true);
-				m_particleSystem.Play ();
-				// SoundCatalog.staticRef.PlayRandomFootstepSound ();
+				m_stepParticle.Play ();
+				SoundCatalog.staticRef.PlayRandomFootstepSound ();
 			}
 		}
 	}
@@ -173,12 +173,16 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 	}
 
+	[SerializeField]
+	private PlayerHurtbox hurtbox;
+
 	/// <summary>
-	/// Would the character be smashed by a wall if you swapped right now?
+	/// Is the character smashed by the wall?
 	/// </summary>
 	public bool SlamCheck () {
-		return hurtbox.withinTrigger;
+		return hurtbox.SlamCheck ();
 	}
+
 
 	public void DieFromSlam () {
 		SoundCatalog.staticRef.PlayDeathSound ();
@@ -187,13 +191,31 @@ public class PlayerCharacter : MonoBehaviour {
 		controller.enabled = false;
 		this.enabled = false;
 
+		m_deathParticle.Play ();
+
 		foreach (Rigidbody rb in ragdollBodies) {
 			rb.isKinematic = false;
-			rb.velocity = new Vector3 (0f, -1f, Random.Range (-10f, -5f));
+			rb.velocity = new Vector3 (Game.staticRef.AUTO_SCROLL_RATE + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
+		}
+		StartCoroutine (Game.staticRef.Halt ());
+	}
+	public void DieFromFall2 () {
+		SoundCatalog.staticRef.PlayDeathSound ();
+		Game.staticRef.scoreCounter.continueUpdating = false;
+		animator.enabled = false;
+		controller.enabled = false;
+		this.enabled = false;
+
+		m_deathParticle.Play ();
+
+		foreach (Rigidbody rb in ragdollBodies) {
+			rb.isKinematic = false;
+			rb.velocity = new Vector3 (Game.staticRef.AUTO_SCROLL_RATE * 1.5f, Random.Range (15f, 25f), Random.Range (-10f, -5f));
 		}
 		StartCoroutine (Game.staticRef.Halt ());
 	}
 	public void DieFromFall () {
+		m_deathParticle.Play ();
 		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		controller.enabled = false;

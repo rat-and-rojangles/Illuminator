@@ -127,7 +127,8 @@ public class WoodMan : MonoBehaviour {
 	/// Would the character be smashed by a wall if you swapped right now?
 	/// </summary>
 	public bool SlamCheck () {
-		return hurtbox.withinTrigger;
+		//return hurtbox.withinTrigger;
+		return false;
 	}
 
 	private void AnimationUpdate () {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class PlaneSegment : MonoBehaviour {
 	[SerializeField]
@@ -61,7 +62,8 @@ public class PlaneSegment : MonoBehaviour {
 			SetTransformZ (0f);
 		}
 		else {
-			SetTransformZ (1f);
+			//SetTransformZ (1f);
+			SetTransformZ (0f);
 		}
 		foreach (Block b in allBlocks) {
 			b.state = plane.state;
@@ -77,5 +79,33 @@ public class PlaneSegment : MonoBehaviour {
 			max = Mathf.Max (r.bounds.max.x, max);
 		}
 		m_width = Mathf.RoundToInt (max - min);
+	}
+
+	[ContextMenu ("Use proxies")]
+	private void Proxy () {
+		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
+
+		Block [] oldBlocks = GetComponentsInChildren<Block> ();
+		foreach (Block b in oldBlocks) {
+			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
+			temp.transform.parent = this.transform;
+			temp.transform.localPosition = b.transform.localPosition;
+
+			DestroyImmediate (b.gameObject);
+		}
+	}
+
+	[ContextMenu ("Reverse proxies")]
+	private void ReverseProxy () {
+		GameObject blockPrefab = Resources.Load ("Block") as GameObject;
+
+		BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
+		foreach (BlockProxy b in oldBlocks) {
+			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
+			temp.transform.parent = this.transform;
+			temp.transform.localPosition = b.transform.localPosition;
+
+			DestroyImmediate (b.gameObject);
+		}
 	}
 }

@@ -3,28 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHurtbox : MonoBehaviour {
-	private bool m_withinTrigger = false;
-	private bool dead = false;
+	[SerializeField]
+	private LayerMask slamMask;
 
-	public bool withinTrigger {
-		get { return m_withinTrigger; }
-	}
+	private BoxCollider2D col;
 
-	void OnTriggerEnter2D (Collider2D col) {
-		ProcessTrigger (col);
-	}
-	void OnTriggerStay2D (Collider2D col) {
-		ProcessTrigger (col);
-	}
-	void OnTriggerExit2D (Collider2D col) {
-		m_withinTrigger = false;
+	void Awake () {
+		col = GetComponent<BoxCollider2D> ();
 	}
 
-	private void ProcessTrigger (Collider2D col) {
-		if (col.CompareTag ("Hazardous") && !dead) {
-			dead = true;
-			Game.staticRef.player.DieFromSlam ();
-		}
-		m_withinTrigger = true;
+	public bool SlamCheck () {
+		Collider2D c2 = Physics2D.OverlapBox (col.bounds.center, col.bounds.size, 0f, slamMask);
+		return c2 != null;
 	}
 }

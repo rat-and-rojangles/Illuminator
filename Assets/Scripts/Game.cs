@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour {
+
+	/// <summary>
+	/// Use this to instantiate new blocks. Kind of a workaround really
+	/// </summary>
+	public GameObject BLOCK_PREFAB;
+
 	private static Game m_staticRef = null;
 	public static Game staticRef {
 		get { return m_staticRef; }
@@ -31,17 +37,6 @@ public class Game : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private Transform boundaryObject;
-	/// <summary>
-	/// Despawn boundary for plane segments and death boundary for player.
-	/// </summary>
-	public float leftBoundary {
-		get {
-			return boundaryObject.position.x;
-		}
-	}
-
-	[SerializeField]
 	private Transform m_worldTransform;
 	/// <summary>
 	/// Reference to the transform of the moving world.
@@ -50,12 +45,26 @@ public class Game : MonoBehaviour {
 		get { return m_worldTransform; }
 	}
 
+	[SerializeField]
+	private GameObject forwardWall;
+
+	private float m_topCamBound;
+	private float m_rightCamBound;
+	/// <summary>
+	/// Despawn boundary for plane segments and death boundary for player.
+	/// </summary>
+	public float leftBoundary {
+		get {
+			return -m_rightCamBound - 2f;
+		}
+	}
+
 	/// <summary>
 	/// Abyss for player.
 	/// </summary>
 	public float bottomBoundary {
 		get {
-			return boundaryObject.position.y;
+			return -m_topCamBound - 2f;
 		}
 	}
 
@@ -64,7 +73,7 @@ public class Game : MonoBehaviour {
 	/// </summary>
 	public float rightSpawnBoundary {
 		get {
-			return -boundaryObject.position.x;
+			return m_rightCamBound - 2f;
 		}
 	}
 
@@ -74,7 +83,7 @@ public class Game : MonoBehaviour {
 
 
 	[SerializeField]
-	private bool checkPrefsForSpeed = true;
+	private bool startAtZero = false;
 	/// <summary>
 	/// Rate at which the level scrolls.
 	/// </summary>
@@ -82,6 +91,18 @@ public class Game : MonoBehaviour {
 
 	void Awake () {
 		m_staticRef = this;
+		if (Camera.main.orthographic) {
+			m_topCamBound = Camera.main.orthographicSize;
+			m_rightCamBound = m_topCamBound * Screen.width / Screen.height;
+		}
+		else {
+			//print (Camera.main.ViewportToWorldPoint (new Vector3 (1f, 1f, Camera.main.transform.position.z)));
+			//print (Camera.main.ViewportToWorldPoint (new Vector3 (0f, 0f, Camera.main.transform.position.z)));
+			m_topCamBound = Camera.main.ViewportToWorldPoint (new Vector3 (0f, 0f, Camera.main.transform.position.z)).y;
+			m_rightCamBound = -Camera.main.ViewportToWorldPoint (new Vector3 (1f, 1f, Camera.main.transform.position.z)).x;
+		}
+
+		forwardWall.transform.position = new Vector3 (rightSpawnBoundary, forwardWall.transform.position.y, forwardWall.transform.position.z);
 	}
 
 	void OnDestroy () {
@@ -89,10 +110,12 @@ public class Game : MonoBehaviour {
 	}
 
 	void Start () {
-		// if (checkPrefsForSpeed) {
-		// 	AUTO_SCROLL_RATE = PlayerPrefs.GetFloat ("Speed", 8f);
-		// }
-		AUTO_SCROLL_RATE = speedByDifficulty [0];
+		if (!startAtZero) {
+			AUTO_SCROLL_RATE = speedByDifficulty [0];
+		}
+		else {
+			AUTO_SCROLL_RATE = 0;
+		}
 		m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
 	}
 
