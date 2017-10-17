@@ -3,48 +3,53 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneManager : MonoBehaviour {
-	private int m_currentActiveIndex = 0;
-	public int currentActiveIndex {
-		get { return m_currentActiveIndex; }
+
+	private Plane m_planeA;
+	public Plane planeA {
+		get { return m_planeA; }
 	}
-	public int m_currentPrimedIndex = 1;
-	public int currentPrimedIndex {
-		get { return m_currentPrimedIndex; }
+	private Plane m_planeB;
+	public Plane planeB {
+		get { return m_planeB; }
 	}
 
 	[SerializeField]
-	private int planesInThisLevel;
-
-	public Plane [] m_planes = null;
-
 	/// <summary>
-	/// All planes in the world.
+	/// The camera that renders the background color.
 	/// </summary>
-	public Plane [] planes {
-		get { return m_planes; }
+	private Camera backgroundCamera;
+
+
+	private bool m_planeAIsActive;
+	/// <summary>
+	/// True if plane A is active, false if plane B is active.
+	/// </summary>
+	public bool planeAIsActive {
+		get { return m_planeAIsActive; }
 	}
+
 
 	public Plane activePlane {
-		get { return planes [currentActiveIndex]; }
+		get { return m_planeAIsActive ? m_planeA : m_planeB; }
 	}
 	public Plane primedPlane {
-		get { return planes [currentPrimedIndex]; }
+		get { return m_planeAIsActive ? m_planeB : m_planeA; }
 	}
 
-	public Material activeMaterial;
-	public Material primedMaterial;
+	[SerializeField]
+	private PlaneSegment initialSegmentA;
+	[SerializeField]
+	private PlaneSegment initialSegmentB;
 
 	void Awake () {
-		m_planes = new Plane [planesInThisLevel];
-
-		float baseHue = PlayerPrefs.GetFloat ("CharacterHue", 0f);
-		for (int x = 0; x < planesInThisLevel; x++) {
-			planes [x] = new Plane (Color.HSVToRGB (Utility.DecimalPart (baseHue + (x + 1) * 1.0f / (planesInThisLevel + 1f)), 1f, 1f));
-		}
+		m_planeA = new Plane ();
+		m_planeA.PushSegment (initialSegmentA);
+		m_planeB = new Plane ();
+		m_planeB.PushSegment (initialSegmentB);
 	}
 
 	void Start () {
-		ApplyColors ();
+		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
 	}
 
 	/// <summary>
@@ -53,28 +58,16 @@ public class PlaneManager : MonoBehaviour {
 	public void Swap () {
 		SoundCatalog.staticRef.PlaySwapSound ();
 
-		Utility.Swap (ref m_currentActiveIndex, ref m_currentPrimedIndex);
-		ApplyColors ();
+		m_planeAIsActive = !m_planeAIsActive;
+
+		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
 
 		activePlane.ApplyState ();
 		primedPlane.ApplyState ();
 
-		// first do a death check on player
+		// do a death check on player
 		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
 			Game.staticRef.player.DieFromSlam ();
 		}
-	}
-
-
-	public void DespawnOldestSegment (int planeIndex) {
-		PlaneSegment rip = Game.staticRef.planeManager.planes [planeIndex].planeSegments.Dequeue ();
-		GameObject.Destroy (rip.gameObject, 0.1f);
-	}
-
-	private void ApplyColors () {
-		activeMaterial.color = planes [currentActiveIndex].color;
-		activeMaterial.SetColor ("_EmissionColor", activeMaterial.color * 0.25f);
-		primedMaterial.color = planes [currentPrimedIndex].color;
-		primedMaterial.SetColor ("_EmissionColor", planes [currentPrimedIndex].color * 0.5f);
 	}
 }

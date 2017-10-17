@@ -41,6 +41,9 @@ public class PlayerCharacter : MonoBehaviour {
 
 	private Rigidbody [] ragdollBodies;
 
+	[SerializeField]
+	private Material characterMaterial;
+
 	/// <summary>
 	/// Derived vertical velocity from jumping
 	/// </summary>
@@ -49,17 +52,14 @@ public class PlayerCharacter : MonoBehaviour {
 		get { return Mathf.Sqrt (2f * jumpHeight * -gravity); }
 	}
 
-	void Awake () {
+	void Start () {
+		characterMaterial.color = Game.staticRef.palette.playerColor;
 		controller = GetComponent<CharacterController2D> ();
 		ragdollBodies = GetComponentsInChildren<Rigidbody> ();
 		timeUntilFullRunSpeed = runAccelerationTime;
-	}
 
-	void Start () {
-		//animator.speed = Game.staticRef.AUTO_SCROLL_RATE * 0.2f;
 		var m = m_stepParticle.main;
 		m.customSimulationSpace = Game.staticRef.worldTransform;
-
 		controller.onControllerCollidedEvent += OnControllerCollide;
 	}
 
@@ -71,7 +71,7 @@ public class PlayerCharacter : MonoBehaviour {
 			if (other != null) {
 				other.StartAnimatingColor ();
 				var m = m_stepParticle.main;
-				m.startColor = other.planeSegment.plane.color;
+				m.startColor = Game.staticRef.palette.activeBlockColor;
 				m_stepParticle.Play ();
 				SoundCatalog.staticRef.PlayRandomFootstepSound ();
 			}
@@ -199,7 +199,7 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 		StartCoroutine (Game.staticRef.Halt ());
 	}
-	public void DieFromFall2 () {
+	public void DieFromFall () {
 		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		animator.enabled = false;
@@ -210,16 +210,8 @@ public class PlayerCharacter : MonoBehaviour {
 
 		foreach (Rigidbody rb in ragdollBodies) {
 			rb.isKinematic = false;
-			rb.velocity = new Vector3 (Game.staticRef.AUTO_SCROLL_RATE * 1.5f, Random.Range (15f, 25f), Random.Range (-10f, -5f));
+			//rb.velocity = velocity * 0.25f;
 		}
-		StartCoroutine (Game.staticRef.Halt ());
-	}
-	public void DieFromFall () {
-		m_deathParticle.Play ();
-		SoundCatalog.staticRef.PlayDeathSound ();
-		Game.staticRef.scoreCounter.continueUpdating = false;
-		controller.enabled = false;
-		this.enabled = false;
 		StartCoroutine (Game.staticRef.Halt ());
 	}
 

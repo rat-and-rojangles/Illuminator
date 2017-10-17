@@ -18,20 +18,19 @@ public class Block : MonoBehaviour {
 			coloring = false;
 			switch (value) {
 				case PlaneState.Primed:
-					m_meshRenderer.transform.localScale = Vector3.one * 0.8f;
+					m_spriteRenderer.color = Game.staticRef.palette.primedBlockColor;
+					m_spriteRenderer.transform.localScale = Vector3.one * 0.9f;
 					m_solidCollider.enabled = false;
 					m_triggerCollider.enabled = true;
-					//m_collider.enabled = false;
-					m_meshRenderer.material = Game.staticRef.planeManager.primedMaterial;
 					m_currentState = value;
 					break;
 				case PlaneState.Active:
+					m_constantRotation.enabled = false;
+					m_spriteRenderer.color = Game.staticRef.palette.activeBlockColor;
 					//ChildTriggerExit ();
 					StartCoroutine (SlideIntoPlace ());
 					m_solidCollider.enabled = true;
 					m_triggerCollider.enabled = false;
-					//m_collider.enabled = true;
-					m_meshRenderer.material = Game.staticRef.planeManager.activeMaterial;
 					m_currentState = value;
 					transform.localScale = Vector3.one;
 					break;
@@ -44,13 +43,16 @@ public class Block : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private MeshRenderer m_meshRenderer;
+	private SpriteRenderer m_spriteRenderer;
 
 	[SerializeField]
 	private BoxCollider2D m_solidCollider;
 
 	[SerializeField]
 	private BoxCollider2D m_triggerCollider;
+
+	[SerializeField]
+	private ConstantRotation m_constantRotation;
 
 	private PlaneSegment m_planeSegment;
 	/// <summary>
@@ -60,23 +62,23 @@ public class Block : MonoBehaviour {
 		get { return m_planeSegment; }
 	}
 
-	void Awake () {
-		//m_collider = GetComponent<BoxCollider2D> ();
-	}
-
 	void Start () {
 		m_planeSegment = transform.parent.GetComponent<PlaneSegment> ();
 		m_planeSegment.allBlocks.Push (this);
-		if (m_planeSegment.plane == Game.staticRef.planeManager.activePlane) {
-			m_currentState = PlaneState.Active;
+		state = m_planeSegment.plane.state;
+		if (state == PlaneState.Primed) {
+			//StartCoroutine (SpinOnSpawn ());
 		}
-		else if (m_planeSegment.plane == Game.staticRef.planeManager.primedPlane) {
-			m_currentState = PlaneState.Primed;
+	}
+
+	private IEnumerator SpinOnSpawn () {
+		float timeElapsed = 0f;
+		m_constantRotation.enabled = true;
+		while (timeElapsed <= BlockProxy.spawnDuration) {
+			timeElapsed += Time.deltaTime;
+			yield return null;
 		}
-		else {
-			m_currentState = PlaneState.Shelved;
-		}
-		state = m_currentState;
+		m_constantRotation.enabled = false;
 	}
 
 	private IEnumerator SlideIntoPlace2 () {
@@ -94,7 +96,7 @@ public class Block : MonoBehaviour {
 	}
 
 	private IEnumerator SlideIntoPlace () {
-		m_meshRenderer.transform.localScale = Vector3.one;
+		m_spriteRenderer.transform.localScale = Vector3.one;
 		float duration = 0.1f;
 
 		float timeElapsed = 0f;
@@ -103,11 +105,11 @@ public class Block : MonoBehaviour {
 
 		while (timeElapsed <= duration) {
 			float ratio = timeElapsed / duration;
-			m_meshRenderer.transform.localScale = Vector3.one * Interpolation.Interpolate (0f, 1f, ratio, InterpolationMethod.Quadratic);
+			m_spriteRenderer.transform.localScale = Vector3.one * Interpolation.Interpolate (0f, 1f, ratio, InterpolationMethod.Quadratic);
 			timeElapsed += Time.deltaTime;
 			yield return null;
 		}
-		m_meshRenderer.transform.localScale = Vector3.one;
+		m_spriteRenderer.transform.localScale = Vector3.one;
 	}
 
 	public void StartAnimatingColor () {
@@ -121,32 +123,27 @@ public class Block : MonoBehaviour {
 	/// Called when a specific child has a trigger enter event
 	/// </summary>
 	public void ChildTriggerEnter () {
-		m_meshRenderer.GetComponent<MeshJitter>().enabled = true;
 		print ("enter");
-		Color myColor = m_meshRenderer.material.color;
-		m_meshRenderer.material = Game.staticRef.planeManager.activeMaterial;
-		m_meshRenderer.material.color = myColor;
-		m_meshRenderer.material.SetColor ("_EmissionColor", myColor);
-		m_meshRenderer.material.SetTextureOffset ("_MainTex", Vector2.zero);
+		m_spriteRenderer.color = Game.staticRef.palette.slamWarningColor;
+		m_constantRotation.enabled = true;
 	}
 
 	/// <summary>
 	/// Called when a specific child has a trigger exit event
 	/// </summary>
 	public void ChildTriggerExit () {
-		m_meshRenderer.GetComponent<MeshJitter>().enabled = false;
 		print ("exit");
-		m_meshRenderer.material = Game.staticRef.planeManager.primedMaterial;
+		m_spriteRenderer.color = Game.staticRef.palette.primedBlockColor;
+		m_constantRotation.enabled = false;
 	}
 
 	private bool coloring = false;
 	private IEnumerator StartAnimatingColorHelper () {
 		float timeElapsed = 0f;
 		float duration = 0.5f;
-		m_meshRenderer.material.SetTextureOffset ("_MainTex", Vector2.zero);
 		while (timeElapsed < duration) {
 			timeElapsed += Time.deltaTime;
-			m_meshRenderer.material.SetColor ("_EmissionColor", m_meshRenderer.material.color * Interpolation.Interpolate (0.25f, 1f, timeElapsed / duration, InterpolationMethod.SquareRoot));
+			m_spriteRenderer.color = Interpolation.Interpolate (Game.staticRef.palette.activeBlockColor, Game.staticRef.palette.illuminatedBlockColor, timeElapsed / duration, InterpolationMethod.SquareRoot);
 			yield return null;
 		}
 	}

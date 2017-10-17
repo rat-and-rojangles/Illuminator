@@ -4,21 +4,9 @@ using UnityEngine;
 
 public class Plane {
 
-	public Plane (Color c) {
-		m_color = c;
+	public Plane () {
 		m_planeSegments = new Queue<PlaneSegment> ();
 	}
-
-	private Color m_color;
-
-	/// <summary>
-	/// Color associated with this plane.
-	/// </summary>
-	/// <returns></returns>
-	public Color color {
-		get { return m_color; }
-	}
-
 	private Queue<PlaneSegment> m_planeSegments;
 	public Queue<PlaneSegment> planeSegments {
 		get { return m_planeSegments; }
@@ -64,14 +52,14 @@ public class Plane {
 	}
 
 	/// <summary>
-	/// Remove the leftmost segment.
+	/// Remove the leftmost segment from this plane.
 	/// </summary>
-	public void PopSegment () {
+	public void DespawnOldestSegment () {
 		PlaneSegment ps = planeSegments.Dequeue ();
 		if (lastImpossible == ps) {
 			lastImpossible = null;
 		}
-		GameObject.Destroy (ps.gameObject);
+		GameObject.Destroy (ps.gameObject, 0.1f);
 	}
 
 	public void ApplyState () {

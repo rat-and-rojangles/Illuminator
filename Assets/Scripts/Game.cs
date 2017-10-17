@@ -73,13 +73,26 @@ public class Game : MonoBehaviour {
 	/// </summary>
 	public float rightSpawnBoundary {
 		get {
-			return m_rightCamBound - 2f;
+			return m_rightCamBound - 1f;
 		}
+	}
+
+	[SerializeField]
+	private Palette m_palette;
+	/// <summary>
+	/// Colors of various objects in the game.
+	/// </summary>
+	/// <returns></returns>
+	public Palette palette {
+		get { return m_palette; }
 	}
 
 	private int difficulty = 0;
 	private float [] speedByDifficulty = { 5f, 7.5f, 10f, 12.5f, 15f, 17.5f, 20f, 22.5f, 25f };
-	private float [] distanceToNextDifficulty = { 100f, 200f, 400f, 600f, 900f, 1200f, 1600f, 2000f, Mathf.Infinity };
+
+	private float difficultyTimeElapsed = 0f;
+	[SerializeField]
+	private float difficultyChangeTime = 5f;
 
 
 	[SerializeField]
@@ -120,10 +133,14 @@ public class Game : MonoBehaviour {
 	}
 
 	void Update () {
-		if (scoreCounter.score > distanceToNextDifficulty [difficulty]) {
-			difficulty++;
-			AUTO_SCROLL_RATE = speedByDifficulty [difficulty];
-			SoundCatalog.staticRef.PlayDeathSound ();
+		if (difficulty < speedByDifficulty.Length - 1) {
+			difficultyTimeElapsed += Time.deltaTime;
+			if (difficultyTimeElapsed >= difficultyChangeTime) {
+				difficultyTimeElapsed = 0f;
+				difficulty++;
+				AUTO_SCROLL_RATE = speedByDifficulty [difficulty];
+				SoundCatalog.staticRef.PlayDeathSound ();
+			}
 		}
 	}
 
@@ -137,6 +154,19 @@ public class Game : MonoBehaviour {
 	/// Gradually halt the level auto scroll.
 	/// </summary>
 	public IEnumerator Halt () {
+		foreach (PlaneSegment ps in Game.staticRef.planeManager.activePlane.planeSegments) {
+			foreach (Block b in ps.allBlocks) {
+				Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
+				temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+			}
+		}
+		foreach (PlaneSegment ps in Game.staticRef.planeManager.primedPlane.planeSegments) {
+			foreach (Block b in ps.allBlocks) {
+				Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
+				temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+			}
+		}
+		difficulty = int.MaxValue;
 		MusicMaster.staticRef.HaltMusic (HALT_DURATION, HALT_INTERP_METHOD);
 		Transform cam = Camera.main.transform.parent.transform;
 		float timeElapsed = 0f;
@@ -144,9 +174,10 @@ public class Game : MonoBehaviour {
 		while (timeElapsed <= HALT_DURATION) {
 			timeElapsed += Time.deltaTime;
 			float ratio = timeElapsed / HALT_DURATION;
-			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, ratio, HALT_INTERP_METHOD);
+			// AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, ratio, HALT_INTERP_METHOD);
+			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 2.5f, ratio, HALT_INTERP_METHOD);
 			float eulerZ = Interpolation.Interpolate (0f, 5f, ratio, HALT_INTERP_METHOD);
-			cam.eulerAngles = new Vector3 (0f, 0f, eulerZ);
+			// cam.eulerAngles = new Vector3 (0f, 0f, eulerZ);
 			yield return null;
 		}
 

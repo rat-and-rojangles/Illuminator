@@ -7,8 +7,16 @@ public class ConstantRotation : MonoBehaviour {
 	[SerializeField]
 	public Vector3 eulerPerSecond;
 
+	private Quaternion initialRotation;
+
+	void OnEnable () {
+		initialRotation = transform.rotation;
+	}
+	void OnDisable () {
+		transform.rotation = initialRotation;
+	}
+
 	void Update () {
-		//transform.eulerAngles += eulerPerSecond * Time.deltaTime;
 		transform.Rotate (eulerPerSecond * Time.deltaTime);
 	}
 }
