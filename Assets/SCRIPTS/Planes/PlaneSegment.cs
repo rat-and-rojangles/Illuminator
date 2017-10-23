@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// using UnityEditor;
+using UnityEditor;
 
 public class PlaneSegment : MonoBehaviour {
 	[SerializeField]
@@ -66,56 +66,56 @@ public class PlaneSegment : MonoBehaviour {
 		}
 	}
 
-	// [ContextMenu ("Auto Calculate Width")]
-	// private void AutoCalculateWidth () {
-	// 	float max = Mathf.NegativeInfinity;
-	// 	float min = Mathf.Infinity;
-	// 	foreach (Renderer r in GetComponentsInChildren<Renderer> ()) {
-	// 		min = Mathf.Min (r.bounds.min.x, min);
-	// 		max = Mathf.Max (r.bounds.max.x, max);
-	// 	}
-	// 	m_width = Mathf.RoundToInt (max - min);
-	// }
+	[ContextMenu ("Auto Calculate Width")]
+	private void AutoCalculateWidth () {
+		float max = Mathf.NegativeInfinity;
+		float min = Mathf.Infinity;
+		foreach (Renderer r in GetComponentsInChildren<Renderer> ()) {
+			min = Mathf.Min (r.bounds.min.x, min);
+			max = Mathf.Max (r.bounds.max.x, max);
+		}
+		m_width = Mathf.RoundToInt (max - min);
+	}
 
-	// [ContextMenu ("Replace blocks with proxies")]
-	// private void Proxy () {
-	// 	GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
+	[ContextMenu ("Replace blocks with proxies")]
+	private void Proxy () {
+		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
 
-	// 	Block [] oldBlocks = GetComponentsInChildren<Block> ();
-	// 	foreach (Block b in oldBlocks) {
-	// 		GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-	// 		temp.transform.parent = this.transform;
-	// 		temp.transform.localPosition = b.transform.localPosition;
+		Block [] oldBlocks = GetComponentsInChildren<Block> ();
+		foreach (Block b in oldBlocks) {
+			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
+			temp.transform.parent = this.transform;
+			temp.transform.localPosition = b.transform.localPosition;
 
-	// 		DestroyImmediate (b.gameObject);
-	// 	}
-	// }
+			DestroyImmediate (b.gameObject);
+		}
+	}
 
-	// [ContextMenu ("Replace proxies with blocks")]
-	// private void ReverseProxy () {
-	// 	GameObject blockPrefab = Resources.Load ("Block") as GameObject;
+	[ContextMenu ("Replace proxies with blocks")]
+	private void ReverseProxy () {
+		GameObject blockPrefab = Resources.Load ("Block") as GameObject;
 
-	// 	BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
-	// 	foreach (BlockProxy b in oldBlocks) {
-	// 		GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-	// 		temp.transform.parent = this.transform;
-	// 		temp.transform.localPosition = b.transform.localPosition;
+		BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
+		foreach (BlockProxy b in oldBlocks) {
+			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
+			temp.transform.parent = this.transform;
+			temp.transform.localPosition = b.transform.localPosition;
 
-	// 		DestroyImmediate (b.gameObject);
-	// 	}
-	// }
+			DestroyImmediate (b.gameObject);
+		}
+	}
 
-	// [ContextMenu ("Update proxies")]
-	// private void ProxyUpdate () {
-	// 	GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
+	[ContextMenu ("Update proxies")]
+	private void ProxyUpdate () {
+		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
 
-	// 	BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
-	// 	foreach (BlockProxy b in oldBlocks) {
-	// 		GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-	// 		temp.transform.parent = this.transform;
-	// 		temp.transform.localPosition = b.transform.localPosition;
+		BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
+		foreach (BlockProxy b in oldBlocks) {
+			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
+			temp.transform.parent = this.transform;
+			temp.transform.localPosition = b.transform.localPosition;
 
-	// 		DestroyImmediate (b.gameObject);
-	// 	}
-	// }
+			DestroyImmediate (b.gameObject);
+		}
+	}
 }

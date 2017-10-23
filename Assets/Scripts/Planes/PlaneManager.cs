@@ -4,6 +4,22 @@ using UnityEngine;
 
 public class PlaneManager : MonoBehaviour {
 
+	[SerializeField]
+	private Material m_activeMaterial;
+	public Material activeMaterial {
+		get { return m_activeMaterial; }
+	}
+	[SerializeField]
+	private Material m_primedMaterial;
+	public Material primedMaterial {
+		get { return m_primedMaterial; }
+	}
+	[SerializeField]
+	private Material m_slamWarningMaterial;
+	public Material slamWarningMaterial {
+		get { return m_slamWarningMaterial; }
+	}
+
 	private Plane m_planeA;
 	public Plane planeA {
 		get { return m_planeA; }
@@ -49,7 +65,14 @@ public class PlaneManager : MonoBehaviour {
 	}
 
 	void Start () {
+		UpdateColors ();
+	}
+
+	private void UpdateColors () {
 		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
+		m_activeMaterial.color = Game.staticRef.palette.activeBlockColor;
+		m_primedMaterial.color = Game.staticRef.palette.primedBlockColor;
+		m_slamWarningMaterial.color = Game.staticRef.palette.slamWarningColor;
 	}
 
 	/// <summary>
@@ -60,7 +83,7 @@ public class PlaneManager : MonoBehaviour {
 
 		m_planeAIsActive = !m_planeAIsActive;
 
-		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
+		UpdateColors ();
 
 		activePlane.ApplyState ();
 		primedPlane.ApplyState ();

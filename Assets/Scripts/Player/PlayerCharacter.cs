@@ -78,7 +78,7 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 	}
 
-	void Update () {
+	void UpdateI () {
 		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
 		jumpThisFrame = jumpThisFrame || Input.GetButtonDown ("Jump");
 		jumpThisFrame = jumpThisFrame && !Input.GetButtonUp ("Jump");
@@ -87,7 +87,8 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 
-	void FixedUpdate () {
+	void Update () {
+		UpdateI ();
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
@@ -120,7 +121,7 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 		if (timeUntilFullRunSpeed > 0f) {
 			derivedRunSpeed *= 0.1f;
-			timeUntilFullRunSpeed -= Time.fixedDeltaTime;
+			timeUntilFullRunSpeed -= Time.deltaTime;
 		}
 
 		if (horizontalInput > 0.1f) {
@@ -137,10 +138,9 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 
 		// apply gravity before moving
-		//velocity.y += gravity * Time.fixedDeltaTime;
-		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.fixedDeltaTime, fallSpeedCutoff, Mathf.Infinity);
+		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.deltaTime, fallSpeedCutoff, Mathf.Infinity);
 
-		controller.move (velocity * Time.fixedDeltaTime);
+		controller.move (velocity * Time.deltaTime);
 		AnimationUpdate ();
 
 		// grab our current velocity to use as a base for all calculations
