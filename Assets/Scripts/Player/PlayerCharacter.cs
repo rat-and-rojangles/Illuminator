@@ -78,7 +78,7 @@ public class PlayerCharacter : MonoBehaviour {
 		}
 	}
 
-	void UpdateI () {
+	void Update () {
 		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
 		jumpThisFrame = jumpThisFrame || Input.GetButtonDown ("Jump");
 		jumpThisFrame = jumpThisFrame && !Input.GetButtonUp ("Jump");
@@ -87,8 +87,8 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 
-	void Update () {
-		UpdateI ();
+	void LateUpdate () {
+		// UpdateI ();
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}

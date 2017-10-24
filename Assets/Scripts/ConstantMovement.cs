@@ -10,7 +10,11 @@ public class ConstantMovement : MonoBehaviour {
 		rb2d = GetComponent<Rigidbody2D> ();
 	}
 
-	void FixedUpdate () {
+	void LateUpdate () {
+		transform.position += Vector3.left * Game.staticRef.AUTO_SCROLL_RATE * Time.deltaTime;
+	}
+
+	void FixedUpdateDUMMY () {
 		rb2d.velocity = Vector2.left * Game.staticRef.AUTO_SCROLL_RATE;
 	}
 }

@@ -133,7 +133,7 @@ public class Game : MonoBehaviour {
 	}
 
 	void Update () {
-		if (difficulty < speedByDifficulty.Length - 1) {
+		if (!startAtZero && difficulty < speedByDifficulty.Length - 1) {
 			difficultyTimeElapsed += Time.deltaTime;
 			if (difficultyTimeElapsed >= difficultyChangeTime) {
 				difficultyTimeElapsed = 0f;
