@@ -46,7 +46,8 @@ public class Game : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private GameObject forwardWall;
+	[Range (0f, 1f)]
+	private float screenGravitateFactor = 0.5f;
 
 	private float m_topCamBound;
 	private float m_rightCamBound;
@@ -77,7 +78,17 @@ public class Game : MonoBehaviour {
 		}
 	}
 
+	public float gravitateXPosition {
+		get {
+			return 2f * m_rightCamBound * screenGravitateFactor - m_rightCamBound;
+		}
+	}
+	/// <summary>
+	/// character color
+	/// </summary>
 	[SerializeField]
+	[Range (0f, 1f)]
+	private float baseHue;
 	private Palette m_palette;
 	/// <summary>
 	/// Colors of various objects in the game.
@@ -103,19 +114,17 @@ public class Game : MonoBehaviour {
 	public float AUTO_SCROLL_RATE = 2.0f;
 
 	void Awake () {
+		// m_palette = new ProceduralPalette (baseHue);
+		m_palette = new ProceduralPalette (Random.value.Normalized01 (), Random.Range (1f / 8f, 0.25f));
 		m_staticRef = this;
 		if (Camera.main.orthographic) {
 			m_topCamBound = Camera.main.orthographicSize;
 			m_rightCamBound = m_topCamBound * Screen.width / Screen.height;
 		}
 		else {
-			//print (Camera.main.ViewportToWorldPoint (new Vector3 (1f, 1f, Camera.main.transform.position.z)));
-			//print (Camera.main.ViewportToWorldPoint (new Vector3 (0f, 0f, Camera.main.transform.position.z)));
 			m_topCamBound = Camera.main.ViewportToWorldPoint (new Vector3 (0f, 0f, Camera.main.transform.position.z)).y;
 			m_rightCamBound = -Camera.main.ViewportToWorldPoint (new Vector3 (1f, 1f, Camera.main.transform.position.z)).x;
 		}
-
-		forwardWall.transform.position = new Vector3 (rightSpawnBoundary, forwardWall.transform.position.y, forwardWall.transform.position.z);
 	}
 
 	void OnDestroy () {
@@ -139,7 +148,7 @@ public class Game : MonoBehaviour {
 				difficultyTimeElapsed = 0f;
 				difficulty++;
 				AUTO_SCROLL_RATE = speedByDifficulty [difficulty];
-				SoundCatalog.staticRef.PlayDeathSound ();
+				SoundCatalog.staticRef.PlaySpeedUpSound ();
 			}
 		}
 	}
@@ -156,14 +165,16 @@ public class Game : MonoBehaviour {
 	public IEnumerator Halt () {
 		foreach (PlaneSegment ps in Game.staticRef.planeManager.activePlane.planeSegments) {
 			foreach (Block b in ps.allBlocks) {
-				Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
-				temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+				// Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
+				// temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+				b.Explode ();
 			}
 		}
 		foreach (PlaneSegment ps in Game.staticRef.planeManager.primedPlane.planeSegments) {
 			foreach (Block b in ps.allBlocks) {
-				Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
-				temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+				// Rigidbody2D temp = b.gameObject.AddComponent<Rigidbody2D> ();
+				// temp.AddForce ((b.transform.position - player.transform.position) * Random.value * 100f);
+				b.Explode ();
 			}
 		}
 		difficulty = int.MaxValue;
@@ -174,29 +185,22 @@ public class Game : MonoBehaviour {
 		while (timeElapsed <= HALT_DURATION) {
 			timeElapsed += Time.deltaTime;
 			float ratio = timeElapsed / HALT_DURATION;
-			// AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 0f, ratio, HALT_INTERP_METHOD);
 			AUTO_SCROLL_RATE = Interpolation.Interpolate (originalScrollRate, 2.5f, ratio, HALT_INTERP_METHOD);
-			float eulerZ = Interpolation.Interpolate (0f, 5f, ratio, HALT_INTERP_METHOD);
-			// cam.eulerAngles = new Vector3 (0f, 0f, eulerZ);
 			yield return null;
 		}
 
 		loseScreen.SetActive (true);
-		bool waitingToExit = true;
-		while (waitingToExit) {
-			if (Input.GetButtonDown ("Swap")) {
-				waitingToExit = false;
-				MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
-				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
-			}
-			else if (Input.GetKeyDown (KeyCode.Backspace)) {
-				waitingToExit = false;
-				SceneManager.LoadScene (0);
-			}
-			else {
-				yield return null;
-			}
+#if UNITY_EDITOR
+		while (!Input.GetButtonDown ("Swap")) {
+			yield return null;
 		}
+#else
+	while (!Utility.ScreenTappedThisFrame ()) {
+			yield return null;
+		}
+#endif
+		MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 
 	}
 }

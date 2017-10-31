@@ -57,6 +57,7 @@ public class Block : MonoBehaviour {
 					m_primedObject.SetActive (true);
 					m_solidCollider.enabled = false;
 					m_triggerCollider.enabled = true;
+					boxCollider.isTrigger = true;
 					m_currentState = value;
 					break;
 				case PlaneState.Active:
@@ -66,6 +67,7 @@ public class Block : MonoBehaviour {
 					StartCoroutine (SlideIntoPlace ());
 					m_solidCollider.enabled = true;
 					m_triggerCollider.enabled = false;
+					boxCollider.isTrigger = false;
 					m_currentState = value;
 					break;
 				case PlaneState.Shelved:
@@ -91,6 +93,10 @@ public class Block : MonoBehaviour {
 		}
 	}
 
+
+	private Rigidbody2D rb2;
+	[SerializeField]
+	private BoxCollider boxCollider;
 	void Start () {
 		m_planeSegment = transform.parent.GetComponent<PlaneSegment> ();
 		m_planeSegment.allBlocks.Push (this);
@@ -98,6 +104,7 @@ public class Block : MonoBehaviour {
 		if (state == PlaneState.Primed) {
 			//StartCoroutine (SpinOnSpawn ());
 		}
+		rb2 = GetComponent<Rigidbody2D> ();
 	}
 
 	private IEnumerator SpinOnSpawn () {
@@ -143,6 +150,7 @@ public class Block : MonoBehaviour {
 
 	public void StartAnimatingColor () {
 		if (!coloring) {
+			SoundCatalog.staticRef.PlayRandomFootstepSound ();
 			coloring = true;
 			StartCoroutine (StartAnimatingColorHelper ());
 		}
@@ -173,6 +181,16 @@ public class Block : MonoBehaviour {
 			m_activeRenderer.material.color = Interpolation.Interpolate (Game.staticRef.palette.activeBlockColor, Game.staticRef.palette.illuminatedBlockColor, timeElapsed / duration, InterpolationMethod.SquareRoot);
 			yield return null;
 		}
+	}
+
+	public void Explode () {
+		// Rigidbody2D rb2 = GetComponent<Rigidbody2D> ();
+		// rb2.isKinematic = false;
+		rb2.simulated = true;
+		rb2.bodyType = RigidbodyType2D.Dynamic;
+		rb2.velocity = Vector2.zero;
+		rb2.AddForce ((transform.position - Game.staticRef.player.transform.position) * Random.value * 200f);
+		boxCollider.enabled = false;
 	}
 
 }

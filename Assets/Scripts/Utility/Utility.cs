@@ -13,10 +13,12 @@ public static class Utility {
 		b = temp;
 	}
 
-	/// <summary>
-	/// like a reverse truncate
-	/// </summary>
-	public static float DecimalPart (float value) {
-		return value - ((int)value);
+	public static bool ScreenTappedThisFrame () {
+		foreach (Touch t in Input.touches) {
+			if (t.phase == TouchPhase.Began) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

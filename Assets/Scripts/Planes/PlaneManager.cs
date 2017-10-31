@@ -15,6 +15,8 @@ public class PlaneManager : MonoBehaviour {
 		get { return m_primedMaterial; }
 	}
 	[SerializeField]
+	private Material m_primedMaterialSecondary;
+	[SerializeField]
 	private Material m_slamWarningMaterial;
 	public Material slamWarningMaterial {
 		get { return m_slamWarningMaterial; }
@@ -72,6 +74,7 @@ public class PlaneManager : MonoBehaviour {
 		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
 		m_activeMaterial.color = Game.staticRef.palette.activeBlockColor;
 		m_primedMaterial.color = Game.staticRef.palette.primedBlockColor;
+		m_primedMaterialSecondary.color = Game.staticRef.palette.primedBlockColor;
 		m_slamWarningMaterial.color = Game.staticRef.palette.slamWarningColor;
 	}
 

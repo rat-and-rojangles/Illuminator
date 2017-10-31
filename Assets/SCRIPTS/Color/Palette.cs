@@ -2,50 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// A set of colors for all objects in the game.
-/// </summary>
-public class Palette : ScriptableObject {
-	[SerializeField]
-	private Color m_player;
-	[SerializeField]
-	private Color m_activeA;
-	[SerializeField]
-	private Color m_primedA;
-	[SerializeField]
-	private Color m_illuminatedA;
-	[SerializeField]
-	private Color m_slamWarningA;
-	[SerializeField]
-	private Color m_backgroundA;
-	[SerializeField]
-	private Color m_activeB;
-	[SerializeField]
-	private Color m_primedB;
-	[SerializeField]
-	private Color m_illuminatedB;
-	[SerializeField]
-	private Color m_slamWarningB;
-	[SerializeField]
-	private Color m_backgroundB;
-
-
+public abstract class Palette {
+	protected abstract Color playerColorProperty { get; }
 	public Color playerColor {
-		get { return m_player; }
+		get { return playerColorProperty; }
 	}
+
+	protected abstract Color activeBlockColorA { get; }
+	protected abstract Color activeBlockColorB { get; }
 	public Color activeBlockColor {
-		get { return Game.staticRef.planeManager.planeAIsActive ? m_activeA : m_activeB; }
+		get { return Game.staticRef.planeManager.planeAIsActive ? activeBlockColorA : activeBlockColorB; }
 	}
+
+	protected abstract Color primedBlockColorA { get; }
+	protected abstract Color primedBlockColorB { get; }
 	public Color primedBlockColor {
-		get { return Game.staticRef.planeManager.planeAIsActive ? m_primedB : m_primedA; }
+		get { return Game.staticRef.planeManager.planeAIsActive ? primedBlockColorB : primedBlockColorA; }
 	}
+
+	protected abstract Color illuminatedBlockColorA { get; }
+	protected abstract Color illuminatedBlockColorB { get; }
 	public Color illuminatedBlockColor {
-		get { return Game.staticRef.planeManager.planeAIsActive ? m_illuminatedA : m_illuminatedB; }
+		get { return Game.staticRef.planeManager.planeAIsActive ? illuminatedBlockColorA : illuminatedBlockColorB; }
 	}
+
+	protected abstract Color slamWarningColorA { get; }
+	protected abstract Color slamWarningColorB { get; }
 	public Color slamWarningColor {
-		get { return Game.staticRef.planeManager.planeAIsActive ? m_slamWarningB : m_slamWarningA; }
+		get { return Game.staticRef.planeManager.planeAIsActive ? slamWarningColorB : slamWarningColorA; }
 	}
+
+	protected abstract Color backgroundColorA { get; }
+	protected abstract Color backgroundColorB { get; }
 	public Color backgroundColor {
-		get { return Game.staticRef.planeManager.planeAIsActive ? m_backgroundA : m_backgroundB; }
+		get { return Game.staticRef.planeManager.planeAIsActive ? backgroundColorA : backgroundColorB; }
 	}
 }

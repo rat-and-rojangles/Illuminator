@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class PlaneSegment : MonoBehaviour {
 	[SerializeField]
@@ -77,6 +80,7 @@ public class PlaneSegment : MonoBehaviour {
 		m_width = Mathf.RoundToInt (max - min);
 	}
 
+#if UNITY_EDITOR
 	[ContextMenu ("Replace blocks with proxies")]
 	private void Proxy () {
 		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
@@ -118,4 +122,5 @@ public class PlaneSegment : MonoBehaviour {
 			DestroyImmediate (b.gameObject);
 		}
 	}
+#endif
 }

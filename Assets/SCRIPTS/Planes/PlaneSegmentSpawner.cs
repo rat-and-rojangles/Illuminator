@@ -31,7 +31,7 @@ public class PlaneSegmentSpawner : MonoBehaviour {
 		}
 		while (furthestRightEdge < Game.staticRef.rightSpawnBoundary) {
 			GameObject [] selectedCollection;
-			if (furthestRightEdge < p2.furthestImpossibleRightEdge || Random.value < 0.5f) {
+			if (furthestRightEdge < p2.furthestImpossibleRightEdge || Random.value < 0.25f) {
 				selectedCollection = possibleSegments;
 			}
 			else {

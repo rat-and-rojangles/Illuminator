@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 
+// https://gist.github.com/cjddmut/fefe5dac35cccfceabec
+
 /// <summary>
-/// HSV representation of a color.
+/// HSV representation of a color. All properties range from 0-1.
 /// </summary>
 public struct ColorHSV {
-	/// <summary>
-	/// Hue value from 0-360
-	/// </summary>
 	public float h;
 	public float s;
 	public float v;

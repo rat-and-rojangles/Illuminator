@@ -65,9 +65,9 @@ public class OptionsMenu : MonoBehaviour {
 		fontMaterial.color = m_color;
 		blockMaterial.color = m_color;
 
-		activeMaterial.color = Color.HSVToRGB (Utility.DecimalPart (hue + 1.0f / 3f), 1f, 1f);;
+		activeMaterial.color = Color.HSVToRGB ((hue + 1.0f / 3f).Normalized01 (), 1f, 1f); ;
 		activeMaterial.SetColor ("_EmissionColor", activeMaterial.color * 0.25f);
-		primedMaterial.color = Color.HSVToRGB (Utility.DecimalPart (hue + 2.0f / 3f), 1f, 1f);
+		primedMaterial.color = Color.HSVToRGB ((hue + 2.0f / 3f).Normalized01 (), 1f, 1f);
 		primedMaterial.SetColor ("_EmissionColor", primedMaterial.color * 0.5f);
 	}
 

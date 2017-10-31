@@ -15,13 +15,6 @@ public class PlayerCharacter : MonoBehaviour {
 	private float jumpHeight = 3.5f;
 	[SerializeField]
 	private float fallSpeedCutoff = -26.25f;
-	/// <summary>
-	/// The character walks for this long before reaching starting to run. (1/10 of normal run speed)
-	/// </summary>
-	[SerializeField]
-	private float runAccelerationTime = 0.15f;
-
-	private float timeUntilFullRunSpeed = 0f;
 
 	private CharacterController2D controller;
 
@@ -35,9 +28,7 @@ public class PlayerCharacter : MonoBehaviour {
 	[SerializeField]
 	private ParticleSystem m_deathParticle;
 
-	private bool swapThisFrame = false;
-	private bool jumpThisFrame = false;
-	private bool cancelJumpThisFrame = false;
+	private IPlayerInputQuery playerInputQuery;
 
 	private Rigidbody [] ragdollBodies;
 
@@ -56,14 +47,20 @@ public class PlayerCharacter : MonoBehaviour {
 		characterMaterial.color = Game.staticRef.palette.playerColor;
 		controller = GetComponent<CharacterController2D> ();
 		ragdollBodies = GetComponentsInChildren<Rigidbody> ();
-		timeUntilFullRunSpeed = runAccelerationTime;
+
+#if UNITY_EDITOR
+		playerInputQuery = new PlayerInputQueryButtons ();
+#else
+		playerInputQuery = new PlayerInputQueryMobile ();
+#endif
 
 		var m = m_stepParticle.main;
 		m.customSimulationSpace = Game.staticRef.worldTransform;
 		controller.onControllerCollidedEvent += OnControllerCollide;
 	}
 
-	private Collider2D lastCollided = null;
+
+	Collider2D lastCollided = null;
 	void OnControllerCollide (RaycastHit2D hit) {
 		if (hit.collider != lastCollided) {
 			lastCollided = hit.collider;
@@ -73,68 +70,35 @@ public class PlayerCharacter : MonoBehaviour {
 				var m = m_stepParticle.main;
 				m.startColor = Game.staticRef.palette.activeBlockColor;
 				m_stepParticle.Play ();
-				SoundCatalog.staticRef.PlayRandomFootstepSound ();
 			}
 		}
 	}
 
+	private bool jumpPressedMidair = false;
+	private bool jumpReleaseQueued = false;
 	void Update () {
-		swapThisFrame = swapThisFrame || Input.GetButtonDown ("Swap");
-		jumpThisFrame = jumpThisFrame || Input.GetButtonDown ("Jump");
-		jumpThisFrame = jumpThisFrame && !Input.GetButtonUp ("Jump");
-
-		cancelJumpThisFrame = cancelJumpThisFrame || Input.GetButtonUp ("Jump");
-	}
-
-
-	void LateUpdate () {
-		// UpdateI ();
+		PlayerInputStruct inputStruct = playerInputQuery.nextInput ();
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
 
-		// we can only jump from the ground
-		if (controller.isGrounded && jumpThisFrame) {
-			jumpThisFrame = false;
+		jumpPressedMidair = jumpPressedMidair || inputStruct.jumpDown;
+
+		if (controller.isGrounded && (inputStruct.jumpDown || (jumpPressedMidair && inputStruct.jumpHeld))) {
+			jumpPressedMidair = false;
 			velocity.y = jumpVelocity;
-			timeUntilFullRunSpeed = -1f;
-			cancelJumpThisFrame = false;
 			SoundCatalog.staticRef.PlayJumpSound ();
 		}
 		// short hop
-		else if (cancelJumpThisFrame && !controller.isGrounded) {
-			cancelJumpThisFrame = false;
-			if (velocity.y > jumpVelocity * 0.5f) {
-				velocity.y = jumpVelocity * 0.5f;
+		else if (!inputStruct.jumpHeld && !controller.isGrounded) {
+			if (velocity.y > jumpVelocity * 0.25f) {
+				velocity.y = jumpVelocity * 0.25f;
 			}
 		}
 
-		float horizontalInput = Input.GetAxis ("Horizontal");
-		float derivedRunSpeed = horizontalInput * runSpeed;
-
-
-		if (controller.isGrounded && horizontalInput.Sign () != velocity.x.Sign ()) {
-			timeUntilFullRunSpeed = runAccelerationTime;
-		}
-		else if (!controller.isGrounded) {
-			timeUntilFullRunSpeed = -1f;
-		}
-		if (timeUntilFullRunSpeed > 0f) {
-			derivedRunSpeed *= 0.1f;
-			timeUntilFullRunSpeed -= Time.deltaTime;
-		}
-
-		if (horizontalInput > 0.1f) {
-			transform.rotation = Quaternion.Euler (Vector3.zero);
-			velocity.x = derivedRunSpeed + Game.staticRef.AUTO_SCROLL_RATE;
-		}
-		else if (horizontalInput < -0.1f) {
-			transform.rotation = Quaternion.Euler (0f, 180f, 0f);
-			velocity.x = derivedRunSpeed;
-		}
-		else {
-			timeUntilFullRunSpeed = runAccelerationTime;
-			velocity.x = 0f;
+		velocity.x = Game.staticRef.AUTO_SCROLL_RATE;
+		if (controller.isGrounded && transform.position.x < Game.staticRef.gravitateXPosition) {
+			velocity.x += Mathf.Lerp (runSpeed * 1.75f, runSpeed * 0f, (transform.position.x - Game.staticRef.leftBoundary) / (Game.staticRef.gravitateXPosition - Game.staticRef.leftBoundary));
 		}
 
 		// apply gravity before moving
@@ -150,9 +114,8 @@ public class PlayerCharacter : MonoBehaviour {
 			DieFromFall ();
 		}
 
-		if (swapThisFrame) {
+		if (inputStruct.swapDown) {
 			Game.staticRef.planeManager.Swap ();
-			swapThisFrame = false;
 		}
 	}
 
@@ -160,16 +123,11 @@ public class PlayerCharacter : MonoBehaviour {
 		if (!controller.isGrounded) {
 			animator.Play ("Fall");
 		}
-		else if (velocity.x.Sign () == 0) {
-			animator.Play ("Idle");
-		}
+		// else if (Physics2D.box) {
+		// 	animator.Play ("Idle");
+		// }
 		else {
-			if (timeUntilFullRunSpeed > 0f) {
-				animator.Play ("Idle");
-			}
-			else {
-				animator.Play ("Run");
-			}
+			animator.Play ("Run");
 		}
 	}
 

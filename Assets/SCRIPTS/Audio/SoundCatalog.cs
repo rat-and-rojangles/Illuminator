@@ -16,6 +16,8 @@ public class SoundCatalog : MonoBehaviour {
 	private AudioClip swap;
 	[SerializeField]
 	private AudioClip death;
+	[SerializeField]
+	private AudioClip speedUp;
 
 	private static SoundCatalog m_staticRef = null;
 	public static SoundCatalog staticRef {
@@ -41,7 +43,10 @@ public class SoundCatalog : MonoBehaviour {
 	public void PlayDeathSound () {
 		audioSource.PlayOneShot (death, 5f);
 	}
+	public void PlaySpeedUpSound () {
+		audioSource.PlayOneShot (speedUp, 5f);
+	}
 	public void PlayRandomFootstepSound () {
-		audioSource.PlayOneShot (footsteps.RandomElement ());
+		// audioSource.PlayOneShot (footsteps.RandomElement ());
 	}
 }

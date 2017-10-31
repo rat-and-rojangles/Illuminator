@@ -60,6 +60,42 @@ public static class CustomExtensions {
 	}
 
 	/// <summary>
+	/// like a reverse truncate
+	/// </summary>
+	public static float DecimalPart (this float value) {
+		return value - ((int)value);
+	}
+
+	/// <summary>
+	/// Normalize the number until it is within a range of 0 (inclusive) and 1(exclusive).
+	/// </summary>
+	public static float Normalized01 (this float value) {
+		float newValue = value;
+		while (newValue < 0f) {
+			newValue += 1f;
+		}
+		while (newValue >= 1f) {
+			newValue -= 1f;
+		}
+		return newValue;
+	}
+
+	/// <summary>
+	/// Return the value clamped between 0 and 1.
+	/// </summary>
+	public static float Clamped01 (this float value) {
+		return Mathf.Clamp01 (value);
+	}
+
+	/// <summary>
+	/// Checks if some number is close to this within some percent of this value.
+	/// </summary>
+	public static bool RoughlyEquals (this float x, float other, float fraction = 0.001f) {
+		float fractionPrime = Mathf.Clamp01 (fraction);
+		return other < x + x * fractionPrime && other > x - x * fractionPrime;
+	}
+
+	/// <summary>
 	/// If 0, returns 1. Else, returns 0. Intended to swap 0 and 1
 	/// </summary>
 	public static int Other (this int x) {

@@ -11,7 +11,12 @@ public class ConstantMovement : MonoBehaviour {
 	}
 
 	void LateUpdate () {
-		transform.position += Vector3.left * Game.staticRef.AUTO_SCROLL_RATE * Time.deltaTime;
+		try {
+			transform.position += Vector3.left * Game.staticRef.AUTO_SCROLL_RATE * Time.deltaTime;
+		}
+		catch (System.Exception e) {
+			print (e);
+		}
 	}
 
 	void FixedUpdateDUMMY () {
