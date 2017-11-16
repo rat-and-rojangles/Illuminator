@@ -29,13 +29,16 @@ public class Plane {
 	}
 
 	public void SpawnNextColumn () {
-		// spawn
-		currentSegment.GetColumn (currentPlaneSegmentIndex).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
-		currentPlaneSegmentIndex++;
-		if (currentPlaneSegmentIndex >= currentSegment.columnCount) {
-			currentPlaneSegmentIndex = 0;
-			currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
-		}
+		//Random.Range (-3, 5
+		float [] blocks = { -5, -4, Random.value < 0.2f ? -1 : 2 };
+		BlockColumn.ConstructNew (blocks).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
+
+		// currentSegment.GetColumn (currentPlaneSegmentIndex).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
+		// currentPlaneSegmentIndex++;
+		// if (currentPlaneSegmentIndex >= currentSegment.columnCount) {
+		// 	currentPlaneSegmentIndex = 0;
+		// 	currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
+		// }
 	}
 
 	public void ApplyState () {
