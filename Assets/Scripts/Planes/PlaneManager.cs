@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneManager : MonoBehaviour {
+	private float m_rightEdge = 0f;
+
+	public float rightEdge { get { return m_rightEdge; } }
+	/// <summary>
+	/// Move the right edge forward by one column.
+	/// </summary>
+	public void NextColumn () {
+		m_rightEdge++;
+	}
 
 	[SerializeField]
 	private Material m_activeMaterial;
@@ -54,19 +63,13 @@ public class PlaneManager : MonoBehaviour {
 		get { return m_planeAIsActive ? m_planeB : m_planeA; }
 	}
 
-	[SerializeField]
-	private PlaneSegment initialSegmentA;
-	[SerializeField]
-	private PlaneSegment initialSegmentB;
-
 	void Awake () {
-		m_planeA = new Plane ();
-		m_planeA.PushSegment (initialSegmentA);
-		m_planeB = new Plane ();
-		m_planeB.PushSegment (initialSegmentB);
+
 	}
 
 	void Start () {
+		m_planeA = new Plane ();
+		m_planeB = new Plane ();
 		UpdateColors ();
 	}
 

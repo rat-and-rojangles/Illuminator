@@ -4,27 +4,14 @@ using UnityEngine;
 
 public class Plane {
 
-	public Plane () {
-		m_planeSegments = new Queue<PlaneSegment> ();
-	}
-	private Queue<PlaneSegment> m_planeSegments;
-	public Queue<PlaneSegment> planeSegments {
-		get { return m_planeSegments; }
-	}
+	public event System.Action<PlaneState> OnPlaneSwap;
 
-	private PlaneSegment lastImpossible;
-	/// <summary>
-	/// X coordinate for the end of the newest impossible segment. No new impossible segments can be placed before it.
-	/// </summary>
-	public float furthestImpossibleRightEdge {
-		get {
-			if (lastImpossible == null) {
-				return Mathf.NegativeInfinity;
-			}
-			else {
-				return lastImpossible.transform.position.x + lastImpossible.width + 0.5f;
-			}
-		}
+	private PlaneSegment currentSegment;
+	private int currentPlaneSegmentIndex = 0;
+
+	public Plane () {
+		currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
+		// m_planeSegments = new Queue<PlaneSegment> ();
 	}
 
 	public PlaneState state {
@@ -41,30 +28,19 @@ public class Plane {
 		}
 	}
 
-	/// <summary>
-	/// Register a new plane segment to the right end of this plane.
-	/// </summary>
-	public void PushSegment (PlaneSegment segment) {
-		if (!segment.possible) {
-			lastImpossible = segment;
+	public void SpawnNextColumn () {
+		// spawn
+		currentSegment.GetColumn (currentPlaneSegmentIndex).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
+		currentPlaneSegmentIndex++;
+		if (currentPlaneSegmentIndex >= currentSegment.columnCount) {
+			currentPlaneSegmentIndex = 0;
+			currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
 		}
-		planeSegments.Enqueue (segment);
-	}
-
-	/// <summary>
-	/// Remove the leftmost segment from this plane.
-	/// </summary>
-	public void DespawnOldestSegment () {
-		PlaneSegment ps = planeSegments.Dequeue ();
-		if (lastImpossible == ps) {
-			lastImpossible = null;
-		}
-		GameObject.Destroy (ps.gameObject, 0.1f);
 	}
 
 	public void ApplyState () {
-		foreach (PlaneSegment ps in m_planeSegments) {
-			ps.ApplyState ();
+		if (OnPlaneSwap != null) {
+			OnPlaneSwap (state);
 		}
 	}
 }

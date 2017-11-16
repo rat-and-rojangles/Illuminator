@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ScoreCounter : MonoBehaviour {
-
-	[SerializeField]
-	private TextMesh textMesh;
+	private UnityEngine.UI.Text text;
 
 	private float initialX;
 
@@ -17,6 +15,7 @@ public class ScoreCounter : MonoBehaviour {
 
 	void Awake () {
 		initialX = transform.position.x;
+		text = GetComponent<UnityEngine.UI.Text> ();
 	}
 
 	void Update () {
@@ -26,6 +25,6 @@ public class ScoreCounter : MonoBehaviour {
 	}
 
 	private void TextUpdate () {
-		textMesh.text = score.ToString ("0.0") + " m";
+		text.text = score.ToString ("0.0") + " m";
 	}
 }

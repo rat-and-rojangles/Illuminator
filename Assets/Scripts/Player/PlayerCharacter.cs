@@ -55,7 +55,6 @@ public class PlayerCharacter : MonoBehaviour {
 #endif
 
 		var m = m_stepParticle.main;
-		m.customSimulationSpace = Game.staticRef.worldTransform;
 		controller.onControllerCollidedEvent += OnControllerCollide;
 	}
 
@@ -66,7 +65,7 @@ public class PlayerCharacter : MonoBehaviour {
 			lastCollided = hit.collider;
 			Block other = hit.collider.transform.parent.GetComponent<Block> ();
 			if (other != null) {
-				other.StartAnimatingColor ();
+				other.Illuminate ();
 				var m = m_stepParticle.main;
 				m.startColor = Game.staticRef.palette.activeBlockColor;
 				m_stepParticle.Play ();
@@ -75,7 +74,6 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	private bool jumpPressedMidair = false;
-	private bool jumpReleaseQueued = false;
 	void Update () {
 		PlayerInputStruct inputStruct = playerInputQuery.nextInput ();
 		if (controller.isGrounded) {
@@ -96,9 +94,9 @@ public class PlayerCharacter : MonoBehaviour {
 			}
 		}
 
-		velocity.x = Game.staticRef.AUTO_SCROLL_RATE;
-		if (controller.isGrounded && transform.position.x < Game.staticRef.gravitateXPosition) {
-			velocity.x += Mathf.Lerp (runSpeed * 1.75f, runSpeed * 0f, (transform.position.x - Game.staticRef.leftBoundary) / (Game.staticRef.gravitateXPosition - Game.staticRef.leftBoundary));
+		velocity.x = Game.staticRef.autoScroller.scrollSpeed;
+		if (controller.isGrounded && transform.position.x < Game.staticRef.boundaries.playerIdealXPosition) {
+			velocity.x += Mathf.Lerp (runSpeed * 1.75f, runSpeed * 0f, (transform.position.x - Game.staticRef.boundaries.deathLineX) / (Game.staticRef.boundaries.playerIdealXPosition - Game.staticRef.boundaries.deathLineX));
 		}
 
 		// apply gravity before moving
@@ -110,7 +108,7 @@ public class PlayerCharacter : MonoBehaviour {
 		// grab our current velocity to use as a base for all calculations
 		velocity = controller.velocity;
 
-		if (transform.position.x < Game.staticRef.leftBoundary || transform.position.y < Game.staticRef.bottomBoundary) {
+		if (transform.position.x < Game.staticRef.boundaries.deathLineX || transform.position.y < Game.staticRef.boundaries.deathLineY) {
 			DieFromFall ();
 		}
 
@@ -123,9 +121,6 @@ public class PlayerCharacter : MonoBehaviour {
 		if (!controller.isGrounded) {
 			animator.Play ("Fall");
 		}
-		// else if (Physics2D.box) {
-		// 	animator.Play ("Idle");
-		// }
 		else {
 			animator.Play ("Run");
 		}
@@ -153,7 +148,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 		foreach (Rigidbody rb in ragdollBodies) {
 			rb.isKinematic = false;
-			rb.velocity = new Vector3 (Game.staticRef.AUTO_SCROLL_RATE + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
+			rb.velocity = new Vector3 (Game.staticRef.autoScroller.scrollSpeed + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
 		}
 		StartCoroutine (Game.staticRef.Halt ());
 	}

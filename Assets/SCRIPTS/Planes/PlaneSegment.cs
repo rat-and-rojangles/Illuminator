@@ -1,126 +1,64 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
-public class PlaneSegment : MonoBehaviour {
-	[SerializeField]
-	private float m_width;
-	public float width {
-		get { return m_width; }
-	}
-
-	public float leftEdge {
-		get { return transform.position.x; }
-	}
-	public float rightEdge {
-		get { return leftEdge + width; }
-	}
+public class PlaneSegment : ScriptableObject {
 
 	[SerializeField]
-	/// <summary>
-	/// Does this belong to planeA?
-	/// </summary>
-	private bool m_isPlaneA;
-
-	/// <summary>
-	/// All blocks in this plane segment. Should be handled as a prefab
-	/// </summary>
-	public Stack<Block> allBlocks = new Stack<Block> ();
-
-	/// <summary>
-	/// The plane this segment is a part of.
-	/// </summary>
-	public Plane plane {
-		get { return m_isPlaneA ? Game.staticRef.planeManager.planeA : Game.staticRef.planeManager.planeB; }
+	private BlockColumn [] m_columns;
+	public BlockColumn GetColumn (int x) {
+		return m_columns [x];
 	}
-	/// <summary>
-	/// Establishes the plane this is part of. Setup only.
-	/// </summary>
-	public void SetPlane (bool isPlaneA) {
-		m_isPlaneA = isPlaneA;
-	}
-
-	[SerializeField]
-	private bool m_possible;
-	/// <summary>
-	/// Can the player cross this without flipping planes?
-	/// </summary>
-	public bool possible {
-		get { return m_possible; }
-	}
-
-	private void SetTransformZ (float value) {
-		transform.position += Vector3.forward * (-transform.position.z + value);
-	}
-
-	public void ApplyState () {
-		if (plane.state == PlaneState.Active) {
-			SetTransformZ (1f);
-		}
-		else {
-			SetTransformZ (0f);
-		}
-		foreach (Block b in allBlocks) {
-			b.state = plane.state;
-		}
-	}
-
-	[ContextMenu ("Auto Calculate Width")]
-	private void AutoCalculateWidth () {
-		float max = Mathf.NegativeInfinity;
-		float min = Mathf.Infinity;
-		foreach (Renderer r in GetComponentsInChildren<Renderer> ()) {
-			min = Mathf.Min (r.bounds.min.x, min);
-			max = Mathf.Max (r.bounds.max.x, max);
-		}
-		m_width = Mathf.RoundToInt (max - min);
+	public int columnCount {
+		get { return m_columns.Length; }
 	}
 
 #if UNITY_EDITOR
-	[ContextMenu ("Replace blocks with proxies")]
-	private void Proxy () {
-		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
+	public void Set (BlockColumn [] columns) {
+		m_columns = columns;
+	}
 
-		Block [] oldBlocks = GetComponentsInChildren<Block> ();
-		foreach (Block b in oldBlocks) {
-			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-			temp.transform.parent = this.transform;
-			temp.transform.localPosition = b.transform.localPosition;
+	[MenuItem ("Assets/Create/Plane Segment Helper")]
+	public static void CreateHelperObject () {
+		GameObject parent = new GameObject ();
+		parent.name = Selection.objects [0].name;
+		parent.AddComponent<PlaneSegmentHelper> ();
 
-			DestroyImmediate (b.gameObject);
+		PlaneSegment ps = Selection.objects [0] as PlaneSegment;
+		for (int x = 0; x < ps.columnCount; x++) {
+			foreach (float y in ps.GetColumn (x).yPositionsRevealed) {
+				GameObject cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
+				cube.transform.position = new Vector3 (x, y, 0);
+				cube.transform.parent = parent.transform;
+			}
+		}
+	}
+	[MenuItem ("Assets/Create/Plane Segment Helper", true)]
+	public static bool ValidateCreateHelperObject () {
+		if (Selection.objects.Length != 1 || !(Selection.objects [0] is PlaneSegment)) {
+			return false;
+		}
+		else {
+			return true;
 		}
 	}
 
-	[ContextMenu ("Replace proxies with blocks")]
-	private void ReverseProxy () {
-		GameObject blockPrefab = Resources.Load ("Block") as GameObject;
-
-		BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
-		foreach (BlockProxy b in oldBlocks) {
-			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-			temp.transform.parent = this.transform;
-			temp.transform.localPosition = b.transform.localPosition;
-
-			DestroyImmediate (b.gameObject);
+	[ContextMenu ("Remove Duplicates")]
+	public void RemoveDuplicates () {
+		foreach (BlockColumn b in m_columns) {
+			b.RemoveDuplicates ();
 		}
 	}
 
-	[ContextMenu ("Update proxies")]
-	private void ProxyUpdate () {
-		GameObject blockPrefab = Resources.Load ("BlockProxy") as GameObject;
-
-		BlockProxy [] oldBlocks = GetComponentsInChildren<BlockProxy> ();
-		foreach (BlockProxy b in oldBlocks) {
-			GameObject temp = PrefabUtility.InstantiatePrefab (blockPrefab) as GameObject;
-			temp.transform.parent = this.transform;
-			temp.transform.localPosition = b.transform.localPosition;
-
-			DestroyImmediate (b.gameObject);
+	[ContextMenu ("Remove End Gap")]
+	public void RemoveEndGap () {
+		List<BlockColumn> tempColumns = new List<BlockColumn> (m_columns);
+		while (tempColumns [tempColumns.Count - 1].yPositionsRevealed.Length == 0) {
+			tempColumns.RemoveAt (tempColumns.Count - 1);
 		}
 	}
+
 #endif
 }
