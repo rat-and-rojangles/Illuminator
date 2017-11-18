@@ -11,8 +11,8 @@ public class PlayerCharacter : MonoBehaviour {
 	private float gravity = -56.25f;
 	[SerializeField]
 	private float runSpeed = 8f;
-	[SerializeField]
-	private float jumpHeight = 3.5f;
+	
+	public float jumpHeight = 3.5f;
 	[SerializeField]
 	private float fallSpeedCutoff = -26.25f;
 
@@ -56,6 +56,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 		var m = m_stepParticle.main;
 		controller.onControllerCollidedEvent += OnControllerCollide;
+		velocity = Vector2.zero;
 	}
 
 

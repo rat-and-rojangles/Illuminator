@@ -9,6 +9,14 @@ public class BlockSpawner : MonoBehaviour {
 	public PlaneSegment [] possibleSegments;
 	public PlaneSegment [] impossibleSegments;
 
+	/// <summary>
+	/// The minimum y position for a block on screen.
+	/// </summary>
+	/// <returns></returns>
+	public static float MIN_BLOCK_Y {
+		get { return -5f; }
+	}
+
 	void Awake () {
 		possibleSegments = Resources.LoadAll<PlaneSegment> ("PlaneSegments/Possible");
 		impossibleSegments = Resources.LoadAll<PlaneSegment> ("PlaneSegments/Impossible");

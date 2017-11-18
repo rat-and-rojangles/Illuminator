@@ -70,6 +70,8 @@ public class PlaneManager : MonoBehaviour {
 	void Start () {
 		m_planeA = new Plane ();
 		m_planeB = new Plane ();
+		m_planeA.RegisterOtherPlane (m_planeB);
+		m_planeB.RegisterOtherPlane (m_planeA);
 		UpdateColors ();
 	}
 

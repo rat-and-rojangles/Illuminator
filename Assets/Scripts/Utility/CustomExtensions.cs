@@ -19,6 +19,19 @@ public static class CustomExtensions {
 	}
 
 	/// <summary>
+	/// Returns the contents of the hashset in an unsorted array.
+	/// </summary>
+	public static T [] ToArray<T> (this HashSet<T> set) {
+		T [] array = new T [set.Count];
+		int x = 0;
+		foreach (T t in set) {
+			array [x] = t;
+			x++;
+		}
+		return array;
+	}
+
+	/// <summary>
 	/// The same color but with a different alpha value.
 	/// </summary>
 	public static Color ChangedAlpha (this Color c, float a) {
