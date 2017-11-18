@@ -7,47 +7,18 @@ using UnityEngine;
 /// </summary>
 [System.Serializable]
 public class BlockColumn {
+	public BlockColumn (bool [] blocks) {
+		this.blocks = blocks;
+	}
 
 	[SerializeField]
-	private float [] yPositions;
+	public bool [] blocks;
 
 	public void Spawn (float xPosition, Plane plane) {
-		foreach (float yPosition in yPositions) {
-			float zPosition = 0f;
-			if (plane.state == PlaneState.Primed) {
-				zPosition = 1f;
-			}
-			Game.staticRef.blockPool.SpawnBlock (new Vector3 (xPosition, yPosition, zPosition), plane);
-		}
-	}
-
-#if UNITY_EDITOR
-	public static BlockColumn ConstructNew (float [] tempPositions) {
-		BlockColumn temp = new BlockColumn ();
-		temp.yPositions = tempPositions;
-		return temp;
-	}
-
-	public float [] yPositionsRevealed {
-		get { return yPositions; }
-	}
-
-	/// <summary>
-	/// Within .2 of each other
-	/// </summary>
-	private static bool RoughlyEquals (float value1, float value2) {
-		return (value2 > value1 - .2f && value2 < value1 + .2f);
-	}
-
-	public void RemoveDuplicates () {
-		List<float> sortedPositions = new List<float> (yPositions);
-		sortedPositions.Sort ();
-		for (int x = sortedPositions.Count - 2; x >= 0; x--) {
-			while (x + 1 < sortedPositions.Count && RoughlyEquals (sortedPositions [x], sortedPositions [x + 1])) {
-				sortedPositions.RemoveAt (x + 1);
+		for (int yOffset = 0; yOffset < blocks.Length; yOffset++) {
+			if (blocks [yOffset]) {
+				Game.staticRef.blockPool.SpawnBlock (new Vector3 (xPosition, yOffset + BlockSpawner.MIN_BLOCK_Y, 0f), plane);
 			}
 		}
-		yPositions = sortedPositions.ToArray ();
 	}
-#endif
 }

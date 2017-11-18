@@ -6,6 +6,12 @@ using UnityEditor;
 #endif
 public class PlaneSegment : ScriptableObject {
 
+	/// <summary>
+	/// Can this segment be cleared without swapping?
+	/// </summary>
+	public bool possible;
+
+	// [HideInInspector]
 	[SerializeField]
 	private BlockColumn [] m_columns;
 	public BlockColumn GetColumn (int x) {
@@ -16,49 +22,46 @@ public class PlaneSegment : ScriptableObject {
 	}
 
 #if UNITY_EDITOR
-	public void Set (BlockColumn [] columns) {
-		m_columns = columns;
-	}
+	// first line contains meta
+	[TextArea]
+	public string csv;
 
-	[MenuItem ("Assets/Create/Plane Segment Helper")]
-	public static void CreateHelperObject () {
-		GameObject parent = new GameObject ();
-		parent.name = Selection.objects [0].name;
-		parent.AddComponent<PlaneSegmentHelper> ();
-
-		PlaneSegment ps = Selection.objects [0] as PlaneSegment;
-		for (int x = 0; x < ps.columnCount; x++) {
-			foreach (float y in ps.GetColumn (x).yPositionsRevealed) {
-				GameObject cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-				cube.transform.position = new Vector3 (x, y, 0);
-				cube.transform.parent = parent.transform;
+	[ContextMenu ("Read From CSV")]
+	public void ReadFromCSV () {
+		//
+		List<string> lines = new List<string> (csv.Split (null));
+		possible = !(lines [0].Contains ("impossible"));
+		lines.RemoveAt (0);
+		for (int x = lines.Count - 1; x >= 0; x--) {
+			if (lines [x].Length == 0) {
+				lines.RemoveAt (x);
 			}
 		}
-	}
-	[MenuItem ("Assets/Create/Plane Segment Helper", true)]
-	public static bool ValidateCreateHelperObject () {
-		if (Selection.objects.Length != 1 || !(Selection.objects [0] is PlaneSegment)) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
 
-	[ContextMenu ("Remove Duplicates")]
-	public void RemoveDuplicates () {
-		foreach (BlockColumn b in m_columns) {
-			b.RemoveDuplicates ();
+		bool [,] cells = new bool [lines [0].Split (',').Length, lines.Count];
+		for (int y = 0; y < lines.Count; y++) {
+			string [] currentRow = lines [y].Split (',');
+			Debug.Log (lines [y] + "(" + currentRow.Length + ")");
+			for (int x = 0; x < currentRow.Length; x++) {
+				if (currentRow [x].Length > 0) {
+					cells [x, y] = true;
+				}
+				else {
+					cells [x, y] = false;
+				}
+			}
+		}
+		m_columns = new BlockColumn [cells.GetLength (0)];
+		for (int x = 0; x < cells.GetLength (0); x++) {
+			List<bool> currentColumn = new List<bool> ();
+			for (int y = cells.GetLength (1) - 1; y >= 0; y--) {
+				currentColumn.Add (cells [x, y]);
+			}
+			while (currentColumn.Count > 0 && !currentColumn [currentColumn.Count - 1]) {
+				currentColumn.RemoveAt (currentColumn.Count - 1);
+			}
+			m_columns [x] = new BlockColumn (currentColumn.ToArray ());
 		}
 	}
-
-	[ContextMenu ("Remove End Gap")]
-	public void RemoveEndGap () {
-		List<BlockColumn> tempColumns = new List<BlockColumn> (m_columns);
-		while (tempColumns [tempColumns.Count - 1].yPositionsRevealed.Length == 0) {
-			tempColumns.RemoveAt (tempColumns.Count - 1);
-		}
-	}
-
 #endif
 }

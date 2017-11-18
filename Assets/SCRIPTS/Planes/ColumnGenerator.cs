@@ -50,17 +50,14 @@ public class ColumnGenerator {
 	}
 
 	private void Spawn () {
-
-		HashSet<float> blocks = new HashSet<float> ();
-		// for (int x = 0; x < height; x++) {
-		// 	blocks.Add (LOWEST_BLOCK + x);
+		throw new System.NotImplementedException ();
+		// HashSet<float> blocks = new HashSet<float> ();
+		// if (height > 0) {
+		// 	blocks.Add (LOWEST_BLOCK);
 		// }
-		if (height > 0) {
-			blocks.Add (LOWEST_BLOCK);
-		}
-		if (height > 1) {
-			blocks.Add (LOWEST_BLOCK + height - 1f);
-		}
-		BlockColumn.ConstructNew (blocks.ToArray ()).Spawn (Game.staticRef.planeManager.rightEdge + 1, plane);
+		// if (height > 1) {
+		// 	blocks.Add (LOWEST_BLOCK + height - 1f);
+		// }
+		// BlockColumn.ConstructNew (blocks.ToArray ()).Spawn (Game.staticRef.planeManager.rightEdge + 1, plane);
 	}
 }

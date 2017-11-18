@@ -12,7 +12,6 @@ public class BlockSpawner : MonoBehaviour {
 	/// <summary>
 	/// The minimum y position for a block on screen.
 	/// </summary>
-	/// <returns></returns>
 	public static float MIN_BLOCK_Y {
 		get { return -5f; }
 	}
