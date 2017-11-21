@@ -14,38 +14,21 @@ public class MusicMaster : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private AudioClip [] songs;
-
-	[SerializeField]
 	private AudioListener listener;
 
 	public float pitch {
-		get { return musicTrack.pitch; }
-		set { musicTrack.pitch = value; }
+		get { return musicSource.pitch; }
+		set { musicSource.pitch = value; }
 	}
 
-	private int currentSongIndex = 0;
 
 	[SerializeField]
-	private AudioSource musicTrack;
+	private AudioSource musicSource;
 
 	public AudioLowPassFilter lowPassFilter;
 
 	public float lowPassMinCutoff {
 		get { return 1350f; }
-	}
-
-	/// <summary>
-	/// Plays a new song.
-	/// </summary>
-	public void SetActiveSong (int songIndex) {
-		if (songIndex != currentSongIndex && songs.WithinBounds (songIndex)) {
-			musicTrack.Stop ();
-			musicTrack.clip = songs [songIndex];
-			RefreshMusic ();
-			musicTrack.Play ();
-			currentSongIndex = songIndex;
-		}
 	}
 
 	void Awake () {
@@ -57,11 +40,6 @@ public class MusicMaster : MonoBehaviour {
 			m_staticRef = this;
 			DontDestroyOnLoad (this.gameObject);
 		}
-		musicTrack.clip = songs [0];
-		if (musicTrack.playOnAwake) {
-			musicTrack.Play ();
-		}
-
 		SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
 
@@ -109,6 +87,6 @@ public class MusicMaster : MonoBehaviour {
 	/// </summary>
 	public void RefreshMusic () {
 		lowPassFilter.cutoffFrequency = 22000f;
-		musicTrack.pitch = 1f;
+		musicSource.pitch = 1f;
 	}
 }

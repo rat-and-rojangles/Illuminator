@@ -125,7 +125,7 @@ public class Game : MonoBehaviour {
 		get { return 1.5f; }
 	}
 	private static InterpolationMethod HALT_INTERP_METHOD {
-		get { return InterpolationMethod.SquareRoot; }
+		get { return InterpolationMethod.Sinusoidal; }
 	}
 	/// <summary>
 	/// Gradually halt the level auto scroll.
