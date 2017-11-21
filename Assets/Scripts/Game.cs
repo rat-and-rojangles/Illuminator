@@ -48,6 +48,11 @@ public class Game : MonoBehaviour {
 		get { return m_boundaries; }
 	}
 
+	private CamShake m_camShake;
+	public CamShake camShake {
+		get { return m_camShake; }
+	}
+
 	private Palette m_palette;
 	/// <summary>
 	/// Colors of various objects in the game.
@@ -66,7 +71,14 @@ public class Game : MonoBehaviour {
 	/// Difficulty from zero to one. Increases over time.
 	/// </summary>
 	public float difficulty {
-		get { return difficultyCounter * 1f / difficultyIntervals; }
+		get {
+			if (difficultyCounter == int.MaxValue) {
+				return 1f;
+			}
+			else {
+				return difficultyCounter * 1f / difficultyIntervals;
+			}
+		}
 	}
 
 	private float difficultyTimeElapsed = 0f;
@@ -80,6 +92,7 @@ public class Game : MonoBehaviour {
 	}
 
 	void Awake () {
+		m_camShake = Camera.main.GetComponent<CamShake> ();
 		m_palette = new ProceduralPalette (Random.value.Normalized01 (), Random.Range (1f / 8f, 0.25f));
 		m_staticRef = this;
 	}
@@ -88,8 +101,12 @@ public class Game : MonoBehaviour {
 		m_staticRef = null;
 	}
 
+	
+	public bool isMainMenu = false;
 	void Start () {
-		m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
+		if (!isMainMenu) {
+			m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
+		}
 	}
 
 	void Update () {
@@ -114,9 +131,6 @@ public class Game : MonoBehaviour {
 	/// Gradually halt the level auto scroll.
 	/// </summary>
 	public IEnumerator Halt () {
-
-		// make all blocks explode
-
 		difficultyCounter = int.MaxValue;
 		MusicMaster.staticRef.HaltMusic (HALT_DURATION, HALT_INTERP_METHOD);
 		Transform cam = Camera.main.transform.parent.transform;

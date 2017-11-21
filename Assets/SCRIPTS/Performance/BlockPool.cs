@@ -8,6 +8,17 @@ public class BlockPool : MonoBehaviour {
 	private Block [] allBlocks;
 
 	/// <summary>
+	/// Explode all active blocks.
+	/// </summary>
+	public void Explode () {
+		for (int x = 0; x < allBlocks.Length; x++) {
+			if (allBlocks [x].gameObject.activeSelf) {
+				allBlocks [x].Explode ();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Put a block from the pool here.
 	/// </summary>
 	public void SpawnBlock (Vector3 position, Plane plane) {
@@ -19,6 +30,7 @@ public class BlockPool : MonoBehaviour {
 		}
 		Debug.LogError ("PUSHING THE BLOCK LIMIT");
 	}
+	//
 #if UNITY_EDITOR
 	[SerializeField]
 	private Transform blockParent;

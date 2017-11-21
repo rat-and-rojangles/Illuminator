@@ -30,6 +30,7 @@ public class Block : MonoBehaviour {
 	private ConstantRotation m_constantRotation;
 
 	private bool shelved = false;
+	private bool exploded = false;
 
 	private Rigidbody2D rb2;
 	[SerializeField]
@@ -47,15 +48,23 @@ public class Block : MonoBehaviour {
 	/// Stops all coroutines, restores the block to its normal state.
 	/// </summary>
 	private void Reset () {
-		if (illuminated) {
-			StopAllCoroutines ();
-			illuminated = false;
-			m_activeRenderer.material = Game.staticRef.planeManager.activeMaterial;
+		if (exploded) {
+			exploded = false;
+			transform.rotation = Quaternion.identity;
+			rb2.bodyType = RigidbodyType2D.Static;
+			boxCollider.enabled = true;
 		}
+		// if (illuminated) {
+		// 	StopAllCoroutines ();
+		// 	illuminated = false;
+		// 	m_activeRenderer.material = Game.staticRef.planeManager.activeMaterial;
+		// 	m_activeRenderer.material.color = Game.staticRef.palette.illuminatedBlockColor;
+		// }
 		if (m_constantRotation.enabled) {
 			m_constantRotation.enabled = false;
 			m_primedRenderer.material = Game.staticRef.planeManager.primedMaterial;
 		}
+
 	}
 
 	private void SetState (PlaneState value) {
@@ -92,6 +101,11 @@ public class Block : MonoBehaviour {
 	}
 
 	public void SpawnSelf (Vector3 pos, Plane plane) {
+		if (illuminated) {
+			StopAllCoroutines ();
+			illuminated = false;
+			m_activeRenderer.material = Game.staticRef.planeManager.activeMaterial;
+		}
 		Reset ();
 		plane.OnPlaneSwap += SetState;
 		m_plane = plane;
@@ -111,7 +125,7 @@ public class Block : MonoBehaviour {
 	}
 
 	void Update () {
-		if (!shelved && transform.position.x < Game.staticRef.boundaries.deathLineX) {        // if x < despawn
+		if ((!shelved && transform.position.x < Game.staticRef.boundaries.deathLineX) || (transform.position.y < Game.staticRef.boundaries.deathLineY)) {        // if x < despawn
 			Despawn ();
 		}
 		else if (shelved && transform.position.x < Game.staticRef.boundaries.revealLineX) {   // if x < reveal
@@ -138,7 +152,8 @@ public class Block : MonoBehaviour {
 
 	public void Illuminate () {
 		if (!illuminated) {
-			SoundCatalog.staticRef.PlayRandomFootstepSound ();
+			Game.staticRef.scoreCounter.illuminatedCount++;
+			// SoundCatalog.staticRef.PlayRandomFootstepSound ();
 			illuminated = true;
 			StartCoroutine (StartAnimatingColorHelper ());
 		}
@@ -164,21 +179,26 @@ public class Block : MonoBehaviour {
 	private IEnumerator StartAnimatingColorHelper () {
 		float timeElapsed = 0f;
 		float duration = 0.5f;
+		Color illuminatedBlockColor = Game.staticRef.palette.illuminatedBlockColor;
 		while (timeElapsed < duration) {
 			timeElapsed += Time.deltaTime;
-			m_activeRenderer.material.color = Interpolation.Interpolate (Game.staticRef.palette.activeBlockColor, Game.staticRef.palette.illuminatedBlockColor, timeElapsed / duration, InterpolationMethod.SquareRoot);
+			m_activeRenderer.material.color = Interpolation.Interpolate (Game.staticRef.palette.activeBlockColor, illuminatedBlockColor, timeElapsed / duration, InterpolationMethod.SquareRoot);
 			yield return null;
 		}
 	}
 
 	public void Explode () {
-		// Rigidbody2D rb2 = GetComponent<Rigidbody2D> ();
-		// rb2.isKinematic = false;
-		rb2.simulated = true;
-		rb2.bodyType = RigidbodyType2D.Dynamic;
-		rb2.velocity = Vector2.zero;
-		rb2.AddForce ((transform.position - Game.staticRef.player.transform.position) * Random.value * 200f);
-		boxCollider.enabled = false;
+		if (!shelved) {
+			rb2.simulated = true;
+			rb2.bodyType = RigidbodyType2D.Dynamic;
+			rb2.velocity = Vector2.zero;
+			rb2.AddForce ((transform.position - Game.staticRef.player.transform.position) * Random.value * 100f);
+			if (plane.state == PlaneState.Primed) {
+				rb2.AddTorque (100 * (Random.value - 0.5f));
+			}
+			boxCollider.enabled = false;
+			exploded = true;
+		}
 	}
 
 }

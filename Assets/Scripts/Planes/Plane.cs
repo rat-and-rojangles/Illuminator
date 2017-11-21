@@ -9,14 +9,25 @@ public class Plane {
 	private PlaneSegment currentSegment;
 	private int currentPlaneSegmentIndex = 0;
 
-	private ColumnGenerator columnGenerator;
+	private Plane other = null;
+
+	/// <summary>
+	/// Cannot spawn from an impossible segment while this number > 0
+	/// </summary>
+	private int blocksBeforeImpossible = 0;
+
+	/// <summary>
+	/// Likelihood of spawning an impossible segment, when available.s
+	/// </summary>
+	private float impossibleSegmentProbability {
+		get { return 10.75f; }
+	}
 
 	public Plane () {
-		currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
-		columnGenerator = new ColumnGenerator (this);
+		currentSegment = new EasyPlaneSegment (Mathf.RoundToInt (Game.staticRef.boundaries.spawnLineX * 2f));
 	}
 	public void RegisterOtherPlane (Plane p) {
-		columnGenerator.other = p.columnGenerator;
+		other = p;
 	}
 
 	public PlaneState state {
@@ -34,20 +45,20 @@ public class Plane {
 	}
 
 	public void SpawnNextColumn () {
-		// random implementation
-		// float [] blocks = { -5, -4, Random.value < 0.2f ? -1 : 2 };
-		// BlockColumn.ConstructNew (blocks).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
-
 		// serialized implementation
 		currentSegment.GetColumn (currentPlaneSegmentIndex).Spawn (Game.staticRef.planeManager.rightEdge + 1, this);
 		currentPlaneSegmentIndex++;
 		if (currentPlaneSegmentIndex >= currentSegment.columnCount) {
 			currentPlaneSegmentIndex = 0;
-			currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
+			if (blocksBeforeImpossible <= 0 && Random.value < impossibleSegmentProbability) {
+				currentSegment = Game.staticRef.spawner.impossibleSegments.RandomElement ();
+				other.blocksBeforeImpossible = currentSegment.columnCount;
+			}
+			else {
+				currentSegment = Game.staticRef.spawner.possibleSegments.RandomElement ();
+			}
 		}
-
-		// procedural implementation
-		// columnGenerator.SpawnNextColumn ();
+		blocksBeforeImpossible--;
 	}
 
 	public void ApplyState () {

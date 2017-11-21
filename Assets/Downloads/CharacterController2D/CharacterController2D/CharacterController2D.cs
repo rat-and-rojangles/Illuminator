@@ -137,7 +137,7 @@ public class CharacterController2D : MonoBehaviour
 	[HideInInspector][NonSerialized]
 	public new Transform transform;
 	[HideInInspector][NonSerialized]
-	public BoxCollider2D boxCollider;
+	public BoxCollider2D boxCollider2D;
 	[HideInInspector][NonSerialized]
 	public Rigidbody2D rigidBody2D;
 
@@ -186,7 +186,7 @@ public class CharacterController2D : MonoBehaviour
 
 		// cache some components
 		transform = GetComponent<Transform>();
-		boxCollider = GetComponent<BoxCollider2D>();
+		boxCollider2D = GetComponent<BoxCollider2D>();
 		rigidBody2D = GetComponent<Rigidbody2D>();
 
 		// here, we trigger our properties that have setters with bodies
@@ -312,11 +312,11 @@ public class CharacterController2D : MonoBehaviour
 	{
 		// figure out the distance between our rays in both directions
 		// horizontal
-		var colliderUseableHeight = boxCollider.size.y * Mathf.Abs( transform.localScale.y ) - ( 2f * _skinWidth );
+		var colliderUseableHeight = boxCollider2D.size.y * Mathf.Abs( transform.localScale.y ) - ( 2f * _skinWidth );
 		_verticalDistanceBetweenRays = colliderUseableHeight / ( totalHorizontalRays - 1 );
 
 		// vertical
-		var colliderUseableWidth = boxCollider.size.x * Mathf.Abs( transform.localScale.x ) - ( 2f * _skinWidth );
+		var colliderUseableWidth = boxCollider2D.size.x * Mathf.Abs( transform.localScale.x ) - ( 2f * _skinWidth );
 		_horizontalDistanceBetweenRays = colliderUseableWidth / ( totalVerticalRays - 1 );
 	}
 
@@ -334,7 +334,7 @@ public class CharacterController2D : MonoBehaviour
 	void primeRaycastOrigins()
 	{
 		// our raycasts need to be fired from the bounds inset by the skinWidth
-		var modifiedBounds = boxCollider.bounds;
+		var modifiedBounds = boxCollider2D.bounds;
 		modifiedBounds.Expand( -2f * _skinWidth );
 
 		_raycastOrigins.topLeft = new Vector2( modifiedBounds.min.x, modifiedBounds.max.y );

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneManager : MonoBehaviour {
-	private float m_rightEdge = 0f;
 
+	private float m_rightEdge = 0f;
 	public float rightEdge { get { return m_rightEdge; } }
+
 	/// <summary>
 	/// Move the right edge forward by one column.
 	/// </summary>
@@ -63,11 +64,8 @@ public class PlaneManager : MonoBehaviour {
 		get { return m_planeAIsActive ? m_planeB : m_planeA; }
 	}
 
-	void Awake () {
-
-	}
-
 	void Start () {
+		m_rightEdge = Game.staticRef.boundaries.deathLineX;
 		m_planeA = new Plane ();
 		m_planeB = new Plane ();
 		m_planeA.RegisterOtherPlane (m_planeB);
@@ -83,10 +81,12 @@ public class PlaneManager : MonoBehaviour {
 		m_slamWarningMaterial.color = Game.staticRef.palette.slamWarningColor;
 	}
 
+
 	/// <summary>
 	/// Swaps the primed and active worlds.
 	/// </summary>
 	public void Swap () {
+		Game.staticRef.camShake.Shake ();
 		SoundCatalog.staticRef.PlaySwapSound ();
 
 		m_planeAIsActive = !m_planeAIsActive;
@@ -98,7 +98,7 @@ public class PlaneManager : MonoBehaviour {
 
 		// do a death check on player
 		if (Game.staticRef.player != null && Game.staticRef.player.SlamCheck ()) {
-			Game.staticRef.player.DieFromSlam ();
+			Game.staticRef.player.Die (true);
 		}
 	}
 }

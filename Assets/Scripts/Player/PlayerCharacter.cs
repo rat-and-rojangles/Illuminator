@@ -11,7 +11,7 @@ public class PlayerCharacter : MonoBehaviour {
 	private float gravity = -56.25f;
 	[SerializeField]
 	private float runSpeed = 8f;
-	
+
 	public float jumpHeight = 3.5f;
 	[SerializeField]
 	private float fallSpeedCutoff = -26.25f;
@@ -110,7 +110,7 @@ public class PlayerCharacter : MonoBehaviour {
 		velocity = controller.velocity;
 
 		if (transform.position.x < Game.staticRef.boundaries.deathLineX || transform.position.y < Game.staticRef.boundaries.deathLineY) {
-			DieFromFall ();
+			Die (false);
 		}
 
 		if (inputStruct.swapDown) {
@@ -137,34 +137,32 @@ public class PlayerCharacter : MonoBehaviour {
 		return hurtbox.SlamCheck ();
 	}
 
-
-	public void DieFromSlam () {
+	public void Die (bool blastOff) {
 		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
-		animator.enabled = false;
-		controller.enabled = false;
 		this.enabled = false;
+		Rigidbody2D myRB = controller.rigidBody2D;
+		BoxCollider2D myBox = controller.boxCollider2D;
+		Destroy (controller);
+		Destroy (myBox);
+		Destroy (myRB);
+		Destroy (animator);
+		Destroy (hurtbox.gameObject);
+
+		Game.staticRef.camShake.FinalShake ();
 
 		m_deathParticle.Play ();
-
-		foreach (Rigidbody rb in ragdollBodies) {
-			rb.isKinematic = false;
-			rb.velocity = new Vector3 (Game.staticRef.autoScroller.scrollSpeed + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
+		Game.staticRef.blockPool.Explode ();
+		if (blastOff) {
+			foreach (Rigidbody rb in ragdollBodies) {
+				rb.isKinematic = false;
+				rb.velocity = new Vector3 (Game.staticRef.autoScroller.scrollSpeed + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
+			}
 		}
-		StartCoroutine (Game.staticRef.Halt ());
-	}
-	public void DieFromFall () {
-		SoundCatalog.staticRef.PlayDeathSound ();
-		Game.staticRef.scoreCounter.continueUpdating = false;
-		animator.enabled = false;
-		controller.enabled = false;
-		this.enabled = false;
-
-		m_deathParticle.Play ();
-
-		foreach (Rigidbody rb in ragdollBodies) {
-			rb.isKinematic = false;
-			//rb.velocity = velocity * 0.25f;
+		else {
+			foreach (Rigidbody rb in ragdollBodies) {
+				rb.isKinematic = false;
+			}
 		}
 		StartCoroutine (Game.staticRef.Halt ());
 	}

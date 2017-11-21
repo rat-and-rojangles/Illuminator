@@ -32,7 +32,7 @@ public class MusicMaster : MonoBehaviour {
 	public AudioLowPassFilter lowPassFilter;
 
 	public float lowPassMinCutoff {
-		get { return 350f; }
+		get { return 1350f; }
 	}
 
 	/// <summary>
@@ -57,7 +57,7 @@ public class MusicMaster : MonoBehaviour {
 			m_staticRef = this;
 			DontDestroyOnLoad (this.gameObject);
 		}
-		musicTrack.clip = songs [currentSongIndex];
+		musicTrack.clip = songs [0];
 		if (musicTrack.playOnAwake) {
 			musicTrack.Play ();
 		}
