@@ -141,13 +141,11 @@ public class PlayerCharacter : MonoBehaviour {
 		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		this.enabled = false;
-		Rigidbody2D myRB = controller.rigidBody2D;
-		BoxCollider2D myBox = controller.boxCollider2D;
-		Destroy (controller);
-		Destroy (myBox);
-		Destroy (myRB);
-		Destroy (animator);
-		Destroy (hurtbox.gameObject);
+		animator.enabled = false;
+		controller.rigidBody2D.simulated = false;
+		controller.boxCollider2D.isTrigger = true;
+		hurtbox.gameObject.SetActive (false);
+		controller.enabled = false;
 
 		Game.staticRef.camShake.FinalShake ();
 
