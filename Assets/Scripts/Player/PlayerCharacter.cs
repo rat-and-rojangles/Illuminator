@@ -32,9 +32,6 @@ public class PlayerCharacter : MonoBehaviour {
 
 	private Rigidbody [] ragdollBodies;
 
-	[SerializeField]
-	private Material characterMaterial;
-
 	/// <summary>
 	/// Derived vertical velocity from jumping
 	/// </summary>
@@ -44,7 +41,6 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	void Start () {
-		characterMaterial.color = Game.staticRef.palette.playerColor;
 		controller = GetComponent<CharacterController2D> ();
 		ragdollBodies = GetComponentsInChildren<Rigidbody> ();
 

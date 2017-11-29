@@ -42,6 +42,9 @@ public class PlaneManager : MonoBehaviour {
 	}
 
 	[SerializeField]
+	private Material characterMaterial;
+
+	[SerializeField]
 	/// <summary>
 	/// The camera that renders the background color.
 	/// </summary>
@@ -71,6 +74,7 @@ public class PlaneManager : MonoBehaviour {
 		m_planeA.RegisterOtherPlane (m_planeB);
 		m_planeB.RegisterOtherPlane (m_planeA);
 		UpdateColors ();
+		characterMaterial.color = Game.staticRef.palette.playerColor;
 	}
 
 	private void UpdateColors () {

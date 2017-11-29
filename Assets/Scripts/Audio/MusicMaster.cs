@@ -25,10 +25,15 @@ public class MusicMaster : MonoBehaviour {
 	[SerializeField]
 	private AudioSource musicSource;
 
-	public AudioLowPassFilter lowPassFilter;
+	[SerializeField]
+	private AudioLowPassFilter lowPassFilter;
 
 	public float lowPassMinCutoff {
 		get { return 1350f; }
+	}
+	public float lpCutoff {
+		get { return lowPassFilter.cutoffFrequency; }
+		set { lowPassFilter.cutoffFrequency = value; }
 	}
 
 	void Awake () {
@@ -79,7 +84,7 @@ public class MusicMaster : MonoBehaviour {
 	}
 
 	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
-		RefreshMusic ();
+		// RefreshMusic ();
 	}
 
 	/// <summary>
