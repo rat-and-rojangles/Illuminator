@@ -12,6 +12,7 @@ public class MainMenuItem : MonoBehaviour {
 		StartCoroutine (ShelveHelper ());
 	}
 	private IEnumerator ShelveHelper () {
+		print ("shelving");
 		Vector3 startPos = transform.position;
 		float elapsedTime = 0f;
 		while (elapsedTime < MainMenuController.INTERPOLATION_TIME) {
@@ -36,4 +37,24 @@ public class MainMenuItem : MonoBehaviour {
 		}
 		transform.position = activePosition;
 	}
+
+
+#if UNITY_EDITOR
+	[ContextMenu ("SetCurrentPositionToActive")]
+	public void SetCurrentPositionToActive () {
+		activePosition = transform.position;
+	}
+	[ContextMenu ("SetCurrentPositionToShelved")]
+	public void SetCurrentPositionToShelved () {
+		shelvedPosition = transform.position;
+	}
+	[ContextMenu ("SnapToActivePosition")]
+	public void SnapToActivePosition () {
+		transform.position = activePosition;
+	}
+	[ContextMenu ("SnapToShelvedPosition")]
+	public void SnapToShelvedPosition () {
+		transform.position = shelvedPosition;
+	}
+#endif
 }

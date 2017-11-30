@@ -36,6 +36,7 @@ public class MusicMaster : MonoBehaviour {
 		set { lowPassFilter.cutoffFrequency = value; }
 	}
 
+	private bool firstLoad = true;
 	void Awake () {
 		if (m_staticRef != null && m_staticRef != this) {
 			Destroy (this.gameObject);
@@ -47,6 +48,13 @@ public class MusicMaster : MonoBehaviour {
 		}
 		SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
+
+#if UNITY_EDITOR
+	[ContextMenu ("HaltMusic")]
+	private void Halt2 () {
+		HaltMusic (1.5f, InterpolationMethod.Sinusoidal);
+	}
+#endif
 
 	public void HaltMusic (float duration, InterpolationMethod method) {
 		StopAllCoroutines ();
@@ -74,17 +82,23 @@ public class MusicMaster : MonoBehaviour {
 	private IEnumerator FadeInMusicHelper (float duration, InterpolationMethod method) {
 		float timeElapsed = 0f;
 		float initialFreq = lowPassFilter.cutoffFrequency;
+		float initialPitch = pitch;
 		while (timeElapsed <= duration) {
 			timeElapsed += Time.deltaTime;
 			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, 22000f, timeElapsed / duration, method);
-			pitch = Interpolation.Interpolate (0.75f, 1f, timeElapsed / duration, method);
+			pitch = Interpolation.Interpolate (initialPitch, 1f, timeElapsed / duration, method);
 			yield return null;
 		}
 		lowPassFilter.cutoffFrequency = 22000f;
 	}
 
 	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
-		// RefreshMusic ();
+		if (!firstLoad) {
+			FadeInMusic (1.25f, InterpolationMethod.SquareRoot);
+		}
+		else {
+			firstLoad = false;
+		}
 	}
 
 	/// <summary>

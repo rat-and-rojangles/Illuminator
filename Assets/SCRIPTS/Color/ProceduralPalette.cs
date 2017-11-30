@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProceduralPalette : Palette {
 	public ProceduralPalette (float primaryHue, float separationFactor) {
-		m_player = new ColorHSV (primaryHue, 1f, 1f, 0.75f);
+		m_player = new ColorHSV (primaryHue, 1f, 1f, 1f);
 		float hueA = (primaryHue - 0.5f + separationFactor).Normalized01 ();
 		float hueB = (primaryHue - 0.5f - separationFactor).Normalized01 ();
 		m_activeA = new ColorHSV (hueA, 0.75f, 0.5f, 1f);

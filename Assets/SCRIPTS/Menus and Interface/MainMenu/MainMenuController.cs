@@ -1,24 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// o
-/// </summary>
 public class MainMenuController : MonoBehaviour {
 
 	[SerializeField]
 	private MainMenuPhase [] menuPhases;
 
-	public SuperBlur.SuperBlurFast blur;
 
-	public const float INTERPOLATION_TIME = 0.25f;
-	public const InterpolationMethod INTERPOLATION_METHOD = InterpolationMethod.Quadratic;
+	public const float INTERPOLATION_TIME = 0.1f;
+	public const InterpolationMethod INTERPOLATION_METHOD = InterpolationMethod.SquareRoot;
 
 	private MainMenuPhase currentPhase;
 
 	void Start () {
-		// MusicMaster.staticRef.l
+		currentPhase = menuPhases [0];
+	}
+
+	public void StartGame () {
+		SceneManager.LoadScene (1);
+	}
+
+	public void RevealNewPhase (MainMenuPhase newPhase) {
+		if (newPhase != currentPhase) {
+			StopAllCoroutines ();
+			StartCoroutine (RevealHelper (newPhase));
+		}
+	}
+
+	private IEnumerator RevealHelper (MainMenuPhase newPhase) {
+		currentPhase.Shelve ();
+		currentPhase = newPhase;
+		yield return new WaitForSeconds (INTERPOLATION_TIME);
+		newPhase.Reveal ();
 	}
 
 }

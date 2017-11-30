@@ -153,7 +153,7 @@ public class Game : MonoBehaviour {
 			yield return null;
 		}
 #endif
-		MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
+		// MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
 		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 
 	}
