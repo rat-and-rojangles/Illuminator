@@ -28,7 +28,9 @@ public class BlockPool : MonoBehaviour {
 				return;
 			}
 		}
-		Debug.LogError ("PUSHING THE BLOCK LIMIT");
+#if UNITY_EDITOR
+		print ("PUSHING THE BLOCK LIMIT");
+#endif
 	}
 	//
 #if UNITY_EDITOR
