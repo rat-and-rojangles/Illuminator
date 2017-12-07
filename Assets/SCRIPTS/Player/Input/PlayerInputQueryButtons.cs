@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInputQueryButtons : IPlayerInputQuery {
-	public PlayerInputStruct nextInput () {
+	public PlayerInputStruct NextInput () {
 		PlayerInputStruct l_input = new PlayerInputStruct ();
 		l_input.jumpDown = Input.GetButtonDown ("Jump");
 		l_input.jumpHeld = Input.GetButton ("Jump");

@@ -12,7 +12,6 @@ public class MainMenuItem : MonoBehaviour {
 		StartCoroutine (ShelveHelper ());
 	}
 	private IEnumerator ShelveHelper () {
-		print ("shelving");
 		Vector3 startPos = transform.position;
 		float elapsedTime = 0f;
 		while (elapsedTime < MainMenuController.INTERPOLATION_TIME) {

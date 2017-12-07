@@ -24,6 +24,13 @@ public class PlaneManager : MonoBehaviour {
 	public Material primedMaterial {
 		get { return m_primedMaterial; }
 	}
+
+	[SerializeField]
+	private Material m_illuminatedMaterial;
+	public Material illuminatedMaterial {
+		get { return m_illuminatedMaterial; }
+	}
+
 	[SerializeField]
 	private Material m_primedMaterialSecondary;
 	[SerializeField]
@@ -79,6 +86,11 @@ public class PlaneManager : MonoBehaviour {
 
 	private void UpdateColors () {
 		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
+
+		if (Game.staticRef.isMainMenu) {
+			m_illuminatedMaterial.color = Game.staticRef.palette.illuminatedBlockColor;
+		}
+
 		m_activeMaterial.color = Game.staticRef.palette.activeBlockColor;
 		m_primedMaterial.color = Game.staticRef.palette.primedBlockColor;
 		m_primedMaterialSecondary.color = Game.staticRef.palette.primedBlockColor;

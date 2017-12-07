@@ -72,7 +72,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 	private bool jumpPressedMidair = false;
 	void Update () {
-		PlayerInputStruct inputStruct = playerInputQuery.nextInput ();
+		PlayerInputStruct inputStruct = playerInputQuery.NextInput ();
 		if (controller.isGrounded) {
 			velocity.y = 0;
 		}
@@ -109,7 +109,7 @@ public class PlayerCharacter : MonoBehaviour {
 			Die (false);
 		}
 
-		if (inputStruct.swapDown) {
+		if (inputStruct.swapDown && !PauseGame.isPaused) {
 			Game.staticRef.planeManager.Swap ();
 		}
 	}
@@ -142,6 +142,7 @@ public class PlayerCharacter : MonoBehaviour {
 		controller.boxCollider2D.isTrigger = true;
 		hurtbox.gameObject.SetActive (false);
 		controller.enabled = false;
+		animator.transform.parent = null;
 
 		Game.staticRef.camShake.FinalShake ();
 

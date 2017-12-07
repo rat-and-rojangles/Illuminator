@@ -101,7 +101,7 @@ public class Game : MonoBehaviour {
 		m_staticRef = null;
 	}
 
-	
+
 	public bool isMainMenu = false;
 	void Start () {
 		if (!isMainMenu) {
@@ -121,25 +121,19 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	private static float HALT_DURATION {
-		get { return 1.5f; }
-	}
-	private static InterpolationMethod HALT_INTERP_METHOD {
-		get { return InterpolationMethod.Sinusoidal; }
-	}
 	/// <summary>
 	/// Gradually halt the level auto scroll.
 	/// </summary>
 	public IEnumerator Halt () {
 		difficultyCounter = int.MaxValue;
-		MusicMaster.staticRef.HaltMusic (HALT_DURATION, HALT_INTERP_METHOD);
+		MusicMaster.staticRef.HaltMusic ();
 		Transform cam = Camera.main.transform.parent.transform;
 		float timeElapsed = 0f;
 		float originalScrollRate = m_autoScroller.scrollSpeed;
-		while (timeElapsed <= HALT_DURATION) {
+		while (timeElapsed <= MusicMaster.staticRef.haltDuration) {
 			timeElapsed += Time.deltaTime;
-			float ratio = timeElapsed / HALT_DURATION;
-			m_autoScroller.SetSpeedManual (Interpolation.Interpolate (originalScrollRate, 2.5f, ratio, HALT_INTERP_METHOD));
+			float ratio = timeElapsed / MusicMaster.staticRef.haltDuration;
+			m_autoScroller.SetSpeedManual (Interpolation.Interpolate (originalScrollRate, 2.5f, ratio, MusicMaster.staticRef.haltInterpolationMethod));
 			yield return null;
 		}
 
@@ -154,7 +148,7 @@ public class Game : MonoBehaviour {
 		}
 #endif
 		// MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
-		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
 
 	}
 }

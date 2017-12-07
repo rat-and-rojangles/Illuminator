@@ -14,13 +14,23 @@ public class MusicMaster : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private AudioListener listener;
+	private AudioPair m_audioPair;
+	public AudioPair audioPair {
+		get { return m_audioPair; }
+		set {
+			m_audioPair = value;
+			ForceLowFreq ();
+			musicSource.clip = audioPair.clip;
+			musicSource.Play ();
+		}
+	}
 
 	public float pitch {
 		get { return musicSource.pitch; }
 		set { musicSource.pitch = value; }
 	}
 
+	private const float volumeReductionFactor = 0.25f;
 
 	[SerializeField]
 	private AudioSource musicSource;
@@ -28,15 +38,9 @@ public class MusicMaster : MonoBehaviour {
 	[SerializeField]
 	private AudioLowPassFilter lowPassFilter;
 
-	public float lowPassMinCutoff {
-		get { return 1350f; }
-	}
-	public float lpCutoff {
-		get { return lowPassFilter.cutoffFrequency; }
-		set { lowPassFilter.cutoffFrequency = value; }
-	}
+	public float haltDuration = 1.25f;
+	public InterpolationMethod haltInterpolationMethod = InterpolationMethod.Sinusoidal;
 
-	private bool firstLoad = true;
 	void Awake () {
 		if (m_staticRef != null && m_staticRef != this) {
 			Destroy (this.gameObject);
@@ -46,19 +50,14 @@ public class MusicMaster : MonoBehaviour {
 			m_staticRef = this;
 			DontDestroyOnLoad (this.gameObject);
 		}
+		audioPair = m_audioPair; // play music
 		SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
 
-#if UNITY_EDITOR
 	[ContextMenu ("HaltMusic")]
-	private void Halt2 () {
-		HaltMusic (1.5f, InterpolationMethod.Sinusoidal);
-	}
-#endif
-
-	public void HaltMusic (float duration, InterpolationMethod method) {
+	public void HaltMusic () {
 		StopAllCoroutines ();
-		StartCoroutine (HaltMusicHelper (duration, method));
+		StartCoroutine (HaltMusicHelper (haltDuration, haltInterpolationMethod));
 	}
 
 	private IEnumerator HaltMusicHelper (float duration, InterpolationMethod method) {
@@ -66,18 +65,23 @@ public class MusicMaster : MonoBehaviour {
 		float initialFreq = lowPassFilter.cutoffFrequency;
 		while (timeElapsed <= duration) {
 			timeElapsed += Time.deltaTime;
-			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, lowPassMinCutoff, timeElapsed / duration, method);
+			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, audioPair.minFrequency, timeElapsed / duration, method);
 			pitch = Interpolation.Interpolate (1f, 0.75f, timeElapsed / duration, method);
+			// musicSource.volume = Interpolation.Interpolate (volumeReductionFactor, 1f, timeElapsed / duration, method);
 			yield return null;
 		}
+	}
+
+	public void ForceLowFreq () {
+		lowPassFilter.cutoffFrequency = m_audioPair.minFrequency;
 	}
 
 	/// <summary>
 	/// Sets the music to start fading in for some duration.
 	/// </summary>
-	public void FadeInMusic (float duration, InterpolationMethod method) {
+	public void FadeInMusic () {
 		StopAllCoroutines ();
-		StartCoroutine (FadeInMusicHelper (duration, method));
+		StartCoroutine (FadeInMusicHelper (haltDuration, haltInterpolationMethod));
 	}
 	private IEnumerator FadeInMusicHelper (float duration, InterpolationMethod method) {
 		float timeElapsed = 0f;
@@ -87,25 +91,18 @@ public class MusicMaster : MonoBehaviour {
 			timeElapsed += Time.deltaTime;
 			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, 22000f, timeElapsed / duration, method);
 			pitch = Interpolation.Interpolate (initialPitch, 1f, timeElapsed / duration, method);
+			// musicSource.volume = Interpolation.Interpolate (1f, volumeReductionFactor, timeElapsed / (duration * 0.75f), method);
 			yield return null;
 		}
 		lowPassFilter.cutoffFrequency = 22000f;
 	}
 
 	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
-		if (!firstLoad) {
-			FadeInMusic (1.25f, InterpolationMethod.SquareRoot);
+		if (scene.buildIndex != 0) {
+			FadeInMusic ();
 		}
 		else {
-			firstLoad = false;
+			lowPassFilter.cutoffFrequency = audioPair.minFrequency;
 		}
-	}
-
-	/// <summary>
-	/// Removes the filter from the song.
-	/// </summary>
-	public void RefreshMusic () {
-		lowPassFilter.cutoffFrequency = 22000f;
-		musicSource.pitch = 1f;
 	}
 }

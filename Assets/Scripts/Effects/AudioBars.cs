@@ -27,7 +27,7 @@ public class AudioBars : MonoBehaviour {
 			float oldHeight = physicalBars [x].transform.localScale.y;
 			float newHeight = audioBands [x] * maxHeight;
 			if (oldHeight > newHeight) {
-				newHeight = Interpolation.Interpolate (oldHeight, newHeight, 10 * Time.deltaTime * (oldHeight / maxHeight), InterpolationMethod.SquareRoot);
+				newHeight = Interpolation.Interpolate (oldHeight, newHeight, 10 * Time.unscaledDeltaTime * (oldHeight / maxHeight), InterpolationMethod.SquareRoot);
 			}
 			physicalBars [x].transform.localScale = new Vector3 (1f, newHeight, 1f);
 		}
