@@ -109,7 +109,7 @@ public class PlayerCharacter : MonoBehaviour {
 			Die (false);
 		}
 
-		if (inputStruct.swapDown && !PauseGame.isPaused) {
+		if (inputStruct.swapDown && !Game.staticRef.pauseScreen.isPaused) {
 			Game.staticRef.planeManager.Swap ();
 		}
 	}
@@ -134,6 +134,9 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 
 	public void Die (bool blastOff) {
+		Game.staticRef.pauseScreen.allowPause = false;
+		Game.staticRef.scoreCounter.WriteScores ();
+
 		SoundCatalog.staticRef.PlayDeathSound ();
 		Game.staticRef.scoreCounter.continueUpdating = false;
 		this.enabled = false;

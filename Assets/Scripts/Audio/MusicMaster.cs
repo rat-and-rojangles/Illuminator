@@ -14,14 +14,19 @@ public class MusicMaster : MonoBehaviour {
 	}
 
 	[SerializeField]
-	private AudioPair m_audioPair;
-	public AudioPair audioPair {
-		get { return m_audioPair; }
-		set {
-			m_audioPair = value;
+	private AudioClip [] songs;
+
+	private void SetAudioPair (AudioClip clip) {
+		if (clip != musicSource.clip) {
 			ForceLowFreq ();
-			musicSource.clip = audioPair.clip;
+			musicSource.clip = clip;
 			musicSource.Play ();
+		}
+	}
+
+	public void SetMusicByIndex (int index) {
+		if (songs.ValidIndex (index)) {
+			SetAudioPair (songs [index]);
 		}
 	}
 
@@ -39,7 +44,9 @@ public class MusicMaster : MonoBehaviour {
 	private AudioLowPassFilter lowPassFilter;
 
 	public float haltDuration = 1.25f;
-	public InterpolationMethod haltInterpolationMethod = InterpolationMethod.Sinusoidal;
+	public InterpolationMethod haltInterpolationMethod = InterpolationMethod.Cubic;
+
+	private const float minFrequency = 600f;
 
 	void Awake () {
 		if (m_staticRef != null && m_staticRef != this) {
@@ -50,7 +57,7 @@ public class MusicMaster : MonoBehaviour {
 			m_staticRef = this;
 			DontDestroyOnLoad (this.gameObject);
 		}
-		audioPair = m_audioPair; // play music
+		SetMusicByIndex (PlayerRecords.musicIndex);
 		SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
 
@@ -64,8 +71,8 @@ public class MusicMaster : MonoBehaviour {
 		float timeElapsed = 0f;
 		float initialFreq = lowPassFilter.cutoffFrequency;
 		while (timeElapsed <= duration) {
-			timeElapsed += Time.deltaTime;
-			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, audioPair.minFrequency, timeElapsed / duration, method);
+			timeElapsed += Time.unscaledDeltaTime;
+			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, minFrequency, timeElapsed / duration, method);
 			pitch = Interpolation.Interpolate (1f, 0.75f, timeElapsed / duration, method);
 			// musicSource.volume = Interpolation.Interpolate (volumeReductionFactor, 1f, timeElapsed / duration, method);
 			yield return null;
@@ -73,28 +80,44 @@ public class MusicMaster : MonoBehaviour {
 	}
 
 	public void ForceLowFreq () {
-		lowPassFilter.cutoffFrequency = m_audioPair.minFrequency;
+		lowPassFilter.cutoffFrequency = minFrequency;
 	}
 
 	/// <summary>
 	/// Sets the music to start fading in for some duration.
 	/// </summary>
-	public void FadeInMusic () {
+	public void FadeInMusic (float targetFrequency = 22000f) {
 		StopAllCoroutines ();
-		StartCoroutine (FadeInMusicHelper (haltDuration, haltInterpolationMethod));
+		StartCoroutine (FadeInMusicHelper (haltDuration, haltInterpolationMethod, targetFrequency));
 	}
-	private IEnumerator FadeInMusicHelper (float duration, InterpolationMethod method) {
+	private IEnumerator FadeInMusicHelper (float duration, InterpolationMethod method, float targetFrequency = 22000f) {
 		float timeElapsed = 0f;
 		float initialFreq = lowPassFilter.cutoffFrequency;
 		float initialPitch = pitch;
 		while (timeElapsed <= duration) {
-			timeElapsed += Time.deltaTime;
-			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, 22000f, timeElapsed / duration, method);
+			timeElapsed += Time.unscaledDeltaTime;
+			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, targetFrequency, timeElapsed / duration, method);
 			pitch = Interpolation.Interpolate (initialPitch, 1f, timeElapsed / duration, method);
-			// musicSource.volume = Interpolation.Interpolate (1f, volumeReductionFactor, timeElapsed / (duration * 0.75f), method);
 			yield return null;
 		}
-		lowPassFilter.cutoffFrequency = 22000f;
+	}
+
+	/// <summary>
+	/// Fades the music in or out without changing pitch.
+	/// </summary>
+	public void FadeFrequency (float duration, bool toLow) {
+		StopAllCoroutines ();
+		StartCoroutine (FadeFrequencyHelper (duration, InterpolationMethod.Cubic, toLow ? minFrequency : 22000f));
+	}
+	private IEnumerator FadeFrequencyHelper (float duration, InterpolationMethod method, float targetFrequency) {
+		float timeElapsed = 0f;
+		float initialFreq = lowPassFilter.cutoffFrequency;
+		float initialPitch = pitch;
+		while (timeElapsed <= duration) {
+			timeElapsed += Time.unscaledDeltaTime;
+			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, targetFrequency, timeElapsed / duration, method);
+			yield return null;
+		}
 	}
 
 	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
@@ -102,7 +125,8 @@ public class MusicMaster : MonoBehaviour {
 			FadeInMusic ();
 		}
 		else {
-			lowPassFilter.cutoffFrequency = audioPair.minFrequency;
+			StopAllCoroutines ();
+			StartCoroutine (FadeInMusicHelper (haltDuration * 0.5f, InterpolationMethod.Quadratic, minFrequency));
 		}
 	}
 }

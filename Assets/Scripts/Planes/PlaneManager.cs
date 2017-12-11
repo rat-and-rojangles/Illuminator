@@ -117,4 +117,18 @@ public class PlaneManager : MonoBehaviour {
 			Game.staticRef.player.Die (true);
 		}
 	}
+
+#if UNITY_EDITOR
+	void Update () {
+		if (Input.GetKeyDown (KeyCode.R)) {
+			RerollPalette ();
+		}
+	}
+	[ContextMenu ("Reroll Palette")]
+	private void RerollPalette () {
+		Game.staticRef.SetPaletteDebug (new ProceduralPalette (Random.value.Normalized01 (), Random.Range (1f / 8f, 0.25f)));
+		UpdateColors ();
+		characterMaterial.color = Game.staticRef.palette.playerColor;
+	}
+#endif
 }

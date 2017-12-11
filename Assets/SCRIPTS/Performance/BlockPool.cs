@@ -29,7 +29,7 @@ public class BlockPool : MonoBehaviour {
 			}
 		}
 #if UNITY_EDITOR
-		print ("PUSHING THE BLOCK LIMIT");
+		//print ("PUSHING THE BLOCK LIMIT");
 #endif
 	}
 	//

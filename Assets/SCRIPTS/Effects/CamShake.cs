@@ -13,7 +13,7 @@ public class CamShake : MonoBehaviour {
 	void Update () {
 		// transform.localPosition = Vector3.right * Mathf.Sin (Time.time * 75f) * Mathf.Clamp01 (timeRemaining / duration) * strength;
 		transform.localPosition = Random.insideUnitCircle * Mathf.Clamp01 (timeRemaining / duration) * maxStrength;
-		timeRemaining -= Time.deltaTime;
+		timeRemaining -= Time.unscaledDeltaTime;
 	}
 	public void Shake () {
 		timeRemaining = duration;

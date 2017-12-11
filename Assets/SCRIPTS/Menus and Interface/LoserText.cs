@@ -12,9 +12,27 @@ public class LoserText : MonoBehaviour {
 
 	[SerializeField]
 	private Text illuminated;
-	void OnEnable () {
+
+	[SerializeField]
+	private float mainMenuDelay = 0.5f;
+
+	[SerializeField]
+	private GameObject mainMenuButton;
+
+	void Awake () {
 		loserMessage.text = loserMessages.RandomElement ();
-		// illuminated.fontSize = Mathf.RoundToInt (loserMessage.cachedTextGenerator.fontSizeUsedForBestFit * 0.5f);
+	}
+
+	/// <summary>
+	/// basically, you dead
+	/// </summary>
+	void OnEnable () {
 		illuminated.text = "illuminated: " + Game.staticRef.scoreCounter.illuminatedCount;
+		StartCoroutine (RevealMainMenuButton ());
+	}
+
+	private IEnumerator RevealMainMenuButton () {
+		yield return new WaitForSeconds (mainMenuDelay);
+		mainMenuButton.SetActive (true);
 	}
 }

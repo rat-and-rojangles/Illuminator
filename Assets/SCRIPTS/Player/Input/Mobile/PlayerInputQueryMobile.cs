@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInputQueryMobile : IPlayerInputQuery {
-	public enum ControlScheme { LeftSwap, RightSwap, TopSwap, BottomSwap }
 	private interface SwapInput {
 		bool swapCondition (Touch t);
 	}
@@ -31,19 +30,18 @@ public class PlayerInputQueryMobile : IPlayerInputQuery {
 	private SwapInput swapInput;
 
 	public PlayerInputQueryMobile () {
-		ControlScheme cs = ControlScheme.LeftSwap;	// should get this from playerprefs
-		switch (cs) {
-			case ControlScheme.LeftSwap:
-				swapInput = new LeftSwap ();
-				break;
-			case ControlScheme.RightSwap:
+		switch (PlayerRecords.controlsIndex) {
+			case 1:
 				swapInput = new RightSwap ();
 				break;
-			case ControlScheme.TopSwap:
+			case 2:
+				swapInput = new BottomSwap ();
+				break;
+			case 3:
 				swapInput = new TopSwap ();
 				break;
-			case ControlScheme.BottomSwap:
-				swapInput = new BottomSwap ();
+			default:						// zero or glitched
+				swapInput = new LeftSwap ();
 				break;
 		}
 	}

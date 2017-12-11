@@ -53,6 +53,12 @@ public class Game : MonoBehaviour {
 		get { return m_camShake; }
 	}
 
+	[SerializeField]
+	private PauseScreen m_pauseScreen;
+	public PauseScreen pauseScreen {
+		get { return m_pauseScreen; }
+	}
+
 	private Palette m_palette;
 	/// <summary>
 	/// Colors of various objects in the game.
@@ -61,6 +67,12 @@ public class Game : MonoBehaviour {
 	public Palette palette {
 		get { return m_palette; }
 	}
+	
+#if UNITY_EDITOR
+	public void SetPaletteDebug (Palette p) {
+		m_palette = p;
+	}
+#endif
 
 	private int difficultyCounter = 0;
 
@@ -138,17 +150,5 @@ public class Game : MonoBehaviour {
 		}
 
 		loseScreen.SetActive (true);
-#if UNITY_EDITOR
-		while (!Input.GetButtonDown ("Swap")) {
-			yield return null;
-		}
-#else
-	while (!Utility.ScreenTappedThisFrame ()) {
-			yield return null;
-		}
-#endif
-		// MusicMaster.staticRef.FadeInMusic (1.25f, HALT_INTERP_METHOD);
-		SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
-
 	}
 }

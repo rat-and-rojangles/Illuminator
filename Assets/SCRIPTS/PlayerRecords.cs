@@ -10,6 +10,8 @@ public static class PlayerRecords {
 	private const string maxDistanceKey = "max_distance";
 	private const string musicKey = "music_index";
 	private const string controlsKey = "controls_index";
+	private const string colorblindKey = "colorblind";
+	private const string tutorialKey = "tutorial";
 
 	/// <summary>
 	/// Total number of blocks illuminated in the user's entire time playing this game.
@@ -56,6 +58,30 @@ public static class PlayerRecords {
 		}
 		set {
 			PlayerPrefs.SetInt (controlsKey, value);
+		}
+	}
+
+	/// <summary>
+	/// Is colorblind mode enabled?
+	/// </summary>
+	public static bool colorblind {
+		get {
+			return PlayerPrefs.GetInt (colorblindKey, 0) == 1;
+		}
+		set {
+			PlayerPrefs.SetInt (colorblindKey, value ? 1 : 0);
+		}
+	}
+
+	/// <summary>
+	/// Is the tutorial mode enabled?
+	/// </summary>
+	public static bool tutorial {
+		get {
+			return PlayerPrefs.GetInt (tutorialKey, 0) == 1;
+		}
+		set {
+			PlayerPrefs.SetInt (tutorialKey, value ? 1 : 0);
 		}
 	}
 }

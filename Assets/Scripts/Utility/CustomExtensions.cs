@@ -14,7 +14,7 @@ public static class CustomExtensions {
 	/// <summary>
 	/// Is this index a valid element for this array?
 	/// </summary>
-	public static bool WithinBounds<T> (this T [] array, int index) {
+	public static bool ValidIndex<T> (this T [] array, int index) {
 		return index >= 0 && index < array.Length;
 	}
 
