@@ -18,7 +18,7 @@ public class MusicMaster : MonoBehaviour {
 
 	private void SetAudioPair (AudioClip clip) {
 		if (clip != musicSource.clip) {
-			ForceLowFreq ();
+			FadeMusic (0f, 1f, minFrequency, InterpolationMethod.Linear);
 			musicSource.clip = clip;
 			musicSource.Play ();
 		}
@@ -35,8 +35,6 @@ public class MusicMaster : MonoBehaviour {
 		set { musicSource.pitch = value; }
 	}
 
-	private const float volumeReductionFactor = 0.25f;
-
 	[SerializeField]
 	private AudioSource musicSource;
 
@@ -46,7 +44,8 @@ public class MusicMaster : MonoBehaviour {
 	public float haltDuration = 1.25f;
 	public InterpolationMethod haltInterpolationMethod = InterpolationMethod.Cubic;
 
-	private const float minFrequency = 600f;
+	public const float minFrequency = 600f;
+	public const float maxFrequency = 22000f;
 
 	void Awake () {
 		if (m_staticRef != null && m_staticRef != this) {
@@ -61,60 +60,18 @@ public class MusicMaster : MonoBehaviour {
 		SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
 
-	[ContextMenu ("HaltMusic")]
-	public void HaltMusic () {
+	public void FadeMusic (float duration, float targetPitch, float targetFrequency, InterpolationMethod method) {
 		StopAllCoroutines ();
-		StartCoroutine (HaltMusicHelper (haltDuration, haltInterpolationMethod));
+		StartCoroutine (FadeMusicHelper (duration, targetPitch, targetFrequency, method));
 	}
 
-	private IEnumerator HaltMusicHelper (float duration, InterpolationMethod method) {
-		float timeElapsed = 0f;
-		float initialFreq = lowPassFilter.cutoffFrequency;
-		while (timeElapsed <= duration) {
-			timeElapsed += Time.unscaledDeltaTime;
-			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, minFrequency, timeElapsed / duration, method);
-			pitch = Interpolation.Interpolate (1f, 0.75f, timeElapsed / duration, method);
-			// musicSource.volume = Interpolation.Interpolate (volumeReductionFactor, 1f, timeElapsed / duration, method);
-			yield return null;
-		}
-	}
-
-	public void ForceLowFreq () {
-		lowPassFilter.cutoffFrequency = minFrequency;
-	}
-
-	/// <summary>
-	/// Sets the music to start fading in for some duration.
-	/// </summary>
-	public void FadeInMusic (float targetFrequency = 22000f) {
-		StopAllCoroutines ();
-		StartCoroutine (FadeInMusicHelper (haltDuration, haltInterpolationMethod, targetFrequency));
-	}
-	private IEnumerator FadeInMusicHelper (float duration, InterpolationMethod method, float targetFrequency = 22000f) {
+	private IEnumerator FadeMusicHelper (float duration, float targetPitch, float targetFrequency, InterpolationMethod method) {
 		float timeElapsed = 0f;
 		float initialFreq = lowPassFilter.cutoffFrequency;
 		float initialPitch = pitch;
 		while (timeElapsed <= duration) {
 			timeElapsed += Time.unscaledDeltaTime;
-			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, targetFrequency, timeElapsed / duration, method);
-			pitch = Interpolation.Interpolate (initialPitch, 1f, timeElapsed / duration, method);
-			yield return null;
-		}
-	}
-
-	/// <summary>
-	/// Fades the music in or out without changing pitch.
-	/// </summary>
-	public void FadeFrequency (float duration, bool toLow) {
-		StopAllCoroutines ();
-		StartCoroutine (FadeFrequencyHelper (duration, InterpolationMethod.Cubic, toLow ? minFrequency : 22000f));
-	}
-	private IEnumerator FadeFrequencyHelper (float duration, InterpolationMethod method, float targetFrequency) {
-		float timeElapsed = 0f;
-		float initialFreq = lowPassFilter.cutoffFrequency;
-		float initialPitch = pitch;
-		while (timeElapsed <= duration) {
-			timeElapsed += Time.unscaledDeltaTime;
+			pitch = Interpolation.Interpolate (initialPitch, targetPitch, timeElapsed / duration, method);
 			lowPassFilter.cutoffFrequency = Interpolation.Interpolate (initialFreq, targetFrequency, timeElapsed / duration, method);
 			yield return null;
 		}
@@ -122,11 +79,10 @@ public class MusicMaster : MonoBehaviour {
 
 	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
 		if (scene.buildIndex != 0) {
-			FadeInMusic ();
+			FadeMusic (haltDuration, 1f, maxFrequency, haltInterpolationMethod);
 		}
 		else {
-			StopAllCoroutines ();
-			StartCoroutine (FadeInMusicHelper (haltDuration * 0.5f, InterpolationMethod.Quadratic, minFrequency));
+			FadeMusic (haltDuration * 0.5f, 1f, minFrequency, InterpolationMethod.Quadratic);
 		}
 	}
 }

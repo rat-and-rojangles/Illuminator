@@ -51,7 +51,7 @@ public class PauseScreen : MonoBehaviour {
 	}
 
 	public void RevealPauseScreen () {
-		MusicMaster.staticRef.FadeFrequency (transitionDuration, true);
+		MusicMaster.staticRef.FadeMusic (transitionDuration, 1f, MusicMaster.minFrequency, InterpolationMethod.Quadratic);
 		m_isPaused = true;
 		Time.timeScale = 0f;
 		infoText.text = "max distance: " + PlayerRecords.maxDistance.ToString ("f1") + " m\ncurrent illuminated: " + Game.staticRef.scoreCounter.illuminatedCount.ToString ("n0");
@@ -59,7 +59,7 @@ public class PauseScreen : MonoBehaviour {
 		StartCoroutine (SlideIntoPlace (activePosition, false));
 	}
 	public void HidePauseScreen () {
-		MusicMaster.staticRef.FadeFrequency (transitionDuration, false);
+		MusicMaster.staticRef.FadeMusic (transitionDuration, 1f, MusicMaster.maxFrequency, InterpolationMethod.Quadratic);
 		m_isPaused = false;
 		StopAllCoroutines ();
 		StartCoroutine (SlideIntoPlace (hiddenPosition, true));

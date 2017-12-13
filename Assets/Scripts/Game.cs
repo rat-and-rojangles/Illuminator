@@ -65,7 +65,7 @@ public class Game : MonoBehaviour {
 	public Palette palette {
 		get { return m_palette; }
 	}
-	
+
 #if UNITY_EDITOR
 	public void SetPaletteDebug (Palette p) {
 		m_palette = p;
@@ -137,7 +137,7 @@ public class Game : MonoBehaviour {
 	/// </summary>
 	public IEnumerator Halt () {
 		difficultyCounter = int.MaxValue;
-		MusicMaster.staticRef.HaltMusic ();
+		MusicMaster.staticRef.FadeMusic (MusicMaster.staticRef.haltDuration, 0.75f, MusicMaster.minFrequency, MusicMaster.staticRef.haltInterpolationMethod);
 		Transform cam = Camera.main.transform.parent.transform;
 		float timeElapsed = 0f;
 		float originalScrollRate = m_autoScroller.scrollSpeed;
