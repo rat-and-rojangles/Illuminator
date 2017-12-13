@@ -87,9 +87,7 @@ public class PlaneManager : MonoBehaviour {
 	private void UpdateColors () {
 		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
 
-		if (Game.staticRef.isMainMenu) {
-			m_illuminatedMaterial.color = Game.staticRef.palette.illuminatedBlockColor;
-		}
+		m_illuminatedMaterial.color = Game.staticRef.palette.illuminatedBlockColor;
 
 		m_activeMaterial.color = Game.staticRef.palette.activeBlockColor;
 		m_primedMaterial.color = Game.staticRef.palette.primedBlockColor;

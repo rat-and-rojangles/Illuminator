@@ -11,6 +11,14 @@ public class BlockColumn {
 		this.blocks = blocks;
 	}
 
+	public static BlockColumn GenerateColumnOfHeight (int height) {
+		bool [] t_blocks = new bool [height];
+		for (int x = 0; x < height; x++) {
+			t_blocks [x] = true;
+		}
+		return new BlockColumn (t_blocks);
+	}
+
 	[SerializeField]
 	public bool [] blocks;
 

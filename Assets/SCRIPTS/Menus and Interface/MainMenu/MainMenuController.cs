@@ -6,6 +6,9 @@ public class MainMenuController : MonoBehaviour {
 	[SerializeField]
 	private MainMenuPhase [] menuPhases;
 
+	[SerializeField]
+	private SceneLoader sceneLoader;
+
 
 	public const float INTERPOLATION_TIME = 0.1f;
 	public const InterpolationMethod INTERPOLATION_METHOD = InterpolationMethod.SquareRoot;
@@ -28,6 +31,10 @@ public class MainMenuController : MonoBehaviour {
 		currentPhase = newPhase;
 		yield return new WaitForSeconds (INTERPOLATION_TIME);
 		newPhase.Reveal ();
+	}
+
+	public void StartGame () {
+		sceneLoader.LoadScene (PlayerRecords.tutorial ? 2 : 1);
 	}
 
 }

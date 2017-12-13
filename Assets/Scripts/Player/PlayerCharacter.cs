@@ -20,7 +20,10 @@ public class PlayerCharacter : MonoBehaviour {
 
 	[SerializeField]
 	private Animator animator;
-	private Vector3 velocity = Vector2.zero;
+	private Vector2 m_velocity = Vector2.zero;
+	public Vector2 velocity {
+		get { return m_velocity; }
+	}
 
 	[SerializeField]
 	private ParticleSystem m_stepParticle;
@@ -52,7 +55,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 		var m = m_stepParticle.main;
 		controller.onControllerCollidedEvent += OnControllerCollide;
-		velocity = Vector2.zero;
+		m_velocity = Vector2.zero;
 	}
 
 
@@ -74,36 +77,36 @@ public class PlayerCharacter : MonoBehaviour {
 	void Update () {
 		PlayerInputStruct inputStruct = playerInputQuery.NextInput ();
 		if (controller.isGrounded) {
-			velocity.y = 0;
+			m_velocity.y = 0;
 		}
 
 		jumpPressedMidair = jumpPressedMidair || inputStruct.jumpDown;
 
 		if (controller.isGrounded && (inputStruct.jumpDown || (jumpPressedMidair && inputStruct.jumpHeld))) {
 			jumpPressedMidair = false;
-			velocity.y = jumpVelocity;
+			m_velocity.y = jumpVelocity;
 			SoundCatalog.staticRef.PlayJumpSound ();
 		}
 		// short hop
 		else if (!inputStruct.jumpHeld && !controller.isGrounded) {
-			if (velocity.y > jumpVelocity * 0.25f) {
-				velocity.y = jumpVelocity * 0.25f;
+			if (m_velocity.y > jumpVelocity * 0.25f) {
+				m_velocity.y = jumpVelocity * 0.25f;
 			}
 		}
 
-		velocity.x = Game.staticRef.autoScroller.scrollSpeed;
+		m_velocity.x = Game.staticRef.autoScroller.scrollSpeed;
 		if (controller.isGrounded && transform.position.x < Game.staticRef.boundaries.playerIdealXPosition) {
-			velocity.x += Mathf.Lerp (runSpeed * 1.75f, runSpeed * 0f, (transform.position.x - Game.staticRef.boundaries.deathLineX) / (Game.staticRef.boundaries.playerIdealXPosition - Game.staticRef.boundaries.deathLineX));
+			m_velocity.x += Mathf.Lerp (runSpeed * 1.75f, runSpeed * 0f, (transform.position.x - Game.staticRef.boundaries.deathLineX) / (Game.staticRef.boundaries.playerIdealXPosition - Game.staticRef.boundaries.deathLineX));
 		}
 
 		// apply gravity before moving
-		velocity.y = Mathf.Clamp (velocity.y + gravity * Time.deltaTime, fallSpeedCutoff, Mathf.Infinity);
+		m_velocity.y = Mathf.Clamp (m_velocity.y + gravity * Time.deltaTime, fallSpeedCutoff, Mathf.Infinity);
 
-		controller.move (velocity * Time.deltaTime);
+		controller.move (m_velocity * Time.deltaTime);
 		AnimationUpdate ();
 
 		// grab our current velocity to use as a base for all calculations
-		velocity = controller.velocity;
+		m_velocity = controller.velocity;
 
 		if (transform.position.x < Game.staticRef.boundaries.deathLineX || transform.position.y < Game.staticRef.boundaries.deathLineY) {
 			Die (false);
@@ -154,7 +157,7 @@ public class PlayerCharacter : MonoBehaviour {
 		if (blastOff) {
 			foreach (Rigidbody rb in ragdollBodies) {
 				rb.isKinematic = false;
-				rb.velocity = new Vector3 (Game.staticRef.autoScroller.scrollSpeed + velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
+				rb.velocity = new Vector3 (Game.staticRef.autoScroller.scrollSpeed + m_velocity.x / 2f, Random.Range (5f, 15f), Random.Range (-10f, -5f));
 			}
 		}
 		else {

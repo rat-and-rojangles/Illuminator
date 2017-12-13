@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EasyPlaneSegment : PlaneSegment {
-	private static BlockColumn column = new BlockColumn (new bool [] { true, true, true });
+	private static BlockColumn column = BlockColumn.GenerateColumnOfHeight (3);
 	private int m_length;
 	public EasyPlaneSegment (int length) {
 		m_length = length;

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour {
 	private static Game m_staticRef = null;
@@ -12,8 +11,7 @@ public class Game : MonoBehaviour {
 	[SerializeField]
 	private PlaneManager m_planeManager;
 
-	[SerializeField]
-	private GameObject loseScreen;
+	public GameObject loseScreen;
 
 	public PlaneManager planeManager {
 		get { return m_planeManager; }
@@ -113,11 +111,12 @@ public class Game : MonoBehaviour {
 		m_staticRef = null;
 	}
 
-
 	public bool isMainMenu = false;
 	void Start () {
 		if (!isMainMenu) {
 			m_player = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerCharacter> ();
+			// later, once I establish the characters:
+			// m_player = m_playerInstantiator.CreatePlayer ();
 		}
 	}
 

@@ -11,7 +11,7 @@ public enum InterpolationMethod {
 	/// </summary>
 	Quadratic,
 	/// <summary>
-	/// Greatest change with t close to 0
+	/// Greatest change with t close to 0.
 	/// </summary>
 	SquareRoot,
 	/// <summary>

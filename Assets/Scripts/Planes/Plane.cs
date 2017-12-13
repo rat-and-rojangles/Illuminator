@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Plane {
 
@@ -24,7 +25,12 @@ public class Plane {
 	}
 
 	public Plane () {
-		currentSegment = new EasyPlaneSegment (Mathf.RoundToInt (Game.staticRef.boundaries.spawnLineX * 2f));
+		if (SceneManager.GetActiveScene ().buildIndex == 2) {	//tutorial
+			currentSegment = TutorialController.GetControllablePlaneSegment (this);
+		}
+		else {
+			currentSegment = new EasyPlaneSegment (Mathf.RoundToInt (Game.staticRef.boundaries.spawnLineX * 2f));
+		}
 	}
 	public void RegisterOtherPlane (Plane p) {
 		other = p;

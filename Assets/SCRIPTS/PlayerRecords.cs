@@ -10,6 +10,7 @@ public static class PlayerRecords {
 	private const string maxDistanceKey = "max_distance";
 	private const string musicKey = "music_index";
 	private const string controlsKey = "controls_index";
+	private const string physiqueKey = "physique_index";
 	private const string colorblindKey = "colorblind";
 	private const string tutorialKey = "tutorial";
 
@@ -58,6 +59,18 @@ public static class PlayerRecords {
 		}
 		set {
 			PlayerPrefs.SetInt (controlsKey, value);
+		}
+	}
+
+	/// <summary>
+	/// Index of the preferred physique.
+	/// </summary>
+	public static int physiqueIndex {
+		get {
+			return PlayerPrefs.GetInt (physiqueKey, 0);
+		}
+		set {
+			PlayerPrefs.SetInt (physiqueKey, value);
 		}
 	}
 
