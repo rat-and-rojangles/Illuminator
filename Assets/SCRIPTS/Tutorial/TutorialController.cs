@@ -58,6 +58,7 @@ public class TutorialController : MonoBehaviour {
 	}
 
 	void Start () {
+		Game.staticRef.pauseScreen.allowPause = false;
 		tutorialPrompt = allTutorialPrompts [PlayerRecords.controlsIndex];
 		StartCoroutine (MainCycle ());
 	}
@@ -69,11 +70,13 @@ public class TutorialController : MonoBehaviour {
 		QueueObstaclesActive ();
 		yield return new WaitForSeconds (2.25f);
 		tutorialPrompt.jumpPrompt.SetActive (true);
+		MusicMaster.staticRef.FadeMusic (0.25f, 1f, MusicMaster.minFrequency, InterpolationMethod.SquareRoot);
 		yield return StartCoroutine (TimeShift (0.25f, 0.5f));
 
 		while (tutorialPrompt.jumpPrompt.activeSelf) {
 			yield return null;
 		}
+		MusicMaster.staticRef.FadeMusic (0.25f, 1f, MusicMaster.maxFrequency, InterpolationMethod.SquareRoot);
 		yield return StartCoroutine (TimeShift (1f, 0.5f));
 
 		// swap test
@@ -81,15 +84,17 @@ public class TutorialController : MonoBehaviour {
 		yield return new WaitForSeconds (2.25f);
 		tutorialPrompt.swapPrompt.SetActive (true);
 		yield return StartCoroutine (TimeShift (0.25f, 0.5f));
+		MusicMaster.staticRef.FadeMusic (0.25f, 1f, MusicMaster.minFrequency, InterpolationMethod.SquareRoot);
 
 		while (tutorialPrompt.swapPrompt.activeSelf) {
 			yield return null;
 		}
+		MusicMaster.staticRef.FadeMusic (0.25f, 1f, MusicMaster.maxFrequency, InterpolationMethod.SquareRoot);
 		yield return StartCoroutine (TimeShift (1f, 0.5f));
 
 		// aptitude test
 		QueueGapActive ();
-		yield return new WaitForSeconds (3f);
+		yield return new WaitForSeconds (4f);
 
 		// swapWarning
 		SetWallPrimed ();

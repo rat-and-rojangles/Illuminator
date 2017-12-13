@@ -26,9 +26,8 @@ public static class Utility {
 	/// True if the user slid a finger down on the screen.
 	/// </summary>
 	public static bool SwipedDownThisFrame () {
-		// screen heights per second
 		foreach (Touch t in Input.touches) {
-			if ((t.deltaPosition.y / Time.deltaTime) / Screen.height < -5f) {
+			if (t.phase == TouchPhase.Moved && t.position.y - t.rawPosition.y < -Screen.height * 0.5f) {
 				return true;
 			}
 		}
@@ -39,9 +38,8 @@ public static class Utility {
 	/// True if the user slid a finger up on the screen.
 	/// </summary>
 	public static bool SwipedUpThisFrame () {
-		// screen heights per second
 		foreach (Touch t in Input.touches) {
-			if ((t.deltaPosition.y / Time.deltaTime) / Screen.height > 15f) {
+			if (t.phase == TouchPhase.Moved && t.position.y - t.rawPosition.y > Screen.height * 0.5f) {
 				return true;
 			}
 		}

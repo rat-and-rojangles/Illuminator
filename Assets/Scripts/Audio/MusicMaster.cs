@@ -18,7 +18,7 @@ public class MusicMaster : MonoBehaviour {
 
 	private void SetAudioPair (AudioClip clip) {
 		if (clip != musicSource.clip) {
-			FadeMusic (0f, 1f, minFrequency, InterpolationMethod.Linear);
+			// FadeMusic (0f, 1f, minFrequency, InterpolationMethod.Linear);
 			musicSource.clip = clip;
 			musicSource.Play ();
 		}

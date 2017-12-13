@@ -25,6 +25,9 @@ public abstract class Palette {
 	public Color illuminatedBlockColor {
 		get { return Game.staticRef.planeManager.planeAIsActive ? illuminatedBlockColorA : illuminatedBlockColorB; }
 	}
+	public Color inverseIlluminatedBlockColor {
+		get { return Game.staticRef.planeManager.planeAIsActive ? illuminatedBlockColorB : illuminatedBlockColorA; }
+	}
 
 	protected abstract Color slamWarningColorA { get; }
 	protected abstract Color slamWarningColorB { get; }

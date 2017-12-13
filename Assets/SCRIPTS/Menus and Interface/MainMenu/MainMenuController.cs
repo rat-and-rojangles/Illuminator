@@ -37,4 +37,8 @@ public class MainMenuController : MonoBehaviour {
 		sceneLoader.LoadScene (PlayerRecords.tutorial ? 2 : 1);
 	}
 
+	public void SetAudioFilterActive (bool value) {
+		MusicMaster.staticRef.FadeMusic (0.1f, 1f, value ? MusicMaster.minFrequency : MusicMaster.maxFrequency, InterpolationMethod.Linear);
+	}
+
 }

@@ -18,6 +18,10 @@ namespace DebugShit {
 			StartCoroutine (Blastoff ());
 		}
 
+		public void SetText (string text) {
+			GetComponent<TextMesh> ().text = text;
+		}
+
 		private IEnumerator Blastoff () {
 			Vector3 endpoint = start + Vector3.up * height;
 			float timeElapsed = 0f;

@@ -91,7 +91,7 @@ public static class PlayerRecords {
 	/// </summary>
 	public static bool tutorial {
 		get {
-			return PlayerPrefs.GetInt (tutorialKey, 0) == 1;
+			return PlayerPrefs.GetInt (tutorialKey, 1) == 1;
 		}
 		set {
 			PlayerPrefs.SetInt (tutorialKey, value ? 1 : 0);

@@ -28,7 +28,7 @@ public class PauseScreen : MonoBehaviour {
 	/// </summary>
 	public bool allowPause = true;
 
-	void Start () {
+	void Awake () {
 		allowPause = true;
 	}
 
