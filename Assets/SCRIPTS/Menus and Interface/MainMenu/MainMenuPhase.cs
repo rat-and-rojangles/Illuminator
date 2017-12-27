@@ -9,7 +9,6 @@ public class MainMenuPhase : MonoBehaviour {
 
 	public float cutoffFrequency;
 
-	// Use this for initialization
 	void Start () {
 		menuItems = GetComponentsInChildren<MainMenuItem> ();
 		foreach (MainMenuItem mmi in menuItems) {
@@ -58,6 +57,12 @@ public class MainMenuPhase : MonoBehaviour {
 	public void SnapToShelvedPosition () {
 		foreach (MainMenuItem mmi in GetComponentsInChildren<MainMenuItem> ()) {
 			mmi.transform.position = mmi.shelvedPosition;
+		}
+	}
+	[ContextMenu ("*Fix Serializations ALL")]
+	public void FixAllSerializations () {
+		foreach (MainMenuItem mmi in GetComponentsInChildren<MainMenuItem> ()) {
+			mmi.FixSerialization ();
 		}
 	}
 #endif
