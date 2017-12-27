@@ -43,7 +43,12 @@ public static class PlayerRecords {
 	/// </summary>
 	public static int musicIndex {
 		get {
-			return PlayerPrefs.GetInt (musicKey, 0);
+			int index = PlayerPrefs.GetInt (musicKey, -1);
+			if (index == -1) {
+				index = Random.Range (0, 4);
+				PlayerPrefs.SetInt (musicKey, index);	// the player is greeted with a random song out of the box
+			}
+			return index;
 		}
 		set {
 			PlayerPrefs.SetInt (musicKey, value);

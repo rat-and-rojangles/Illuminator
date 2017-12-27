@@ -39,9 +39,6 @@ public class PlaneManager : MonoBehaviour {
 		get { return m_slamWarningMaterial; }
 	}
 
-	[SerializeField]
-	private Material m_inverseIlluminatedMaterial;
-
 	private Plane m_planeA;
 	public Plane planeA {
 		get { return m_planeA; }
@@ -91,7 +88,6 @@ public class PlaneManager : MonoBehaviour {
 		backgroundCamera.backgroundColor = Game.staticRef.palette.backgroundColor;
 
 		m_illuminatedMaterial.color = Game.staticRef.palette.illuminatedBlockColor;
-		m_inverseIlluminatedMaterial.color = Game.staticRef.palette.inverseIlluminatedBlockColor;
 
 		m_activeMaterial.color = Game.staticRef.palette.activeBlockColor;
 		m_primedMaterial.color = Game.staticRef.palette.primedBlockColor;
